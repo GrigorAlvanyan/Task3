@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-$dataname = '';
 
 function dd($res)
 {
@@ -14,6 +13,8 @@ $host = '10.1.1.41';
 $user = 'root';
 $password = '1234';
 $dbname = 'netxms';
+$nodeName = '';
+
 //$filteredNames = ['NodeUpTime', 'TV Laser', 'Temperature'];
 $filteredNames = [];
 $severityStatuses = [
@@ -33,27 +34,33 @@ if (!$connection) {
 
 if (isset($_GET['name']) && !empty($_GET['name'])) {
 
-    $dataname = $_GET['name'];
-    $_SESSION['name'] = $dataname;
+    $nodeName = $_GET['name'];
+    $_SESSION['name'] = $nodeName;
 
-    function getResult($connection, $dataname, $filteredNames, $severityStatuses)
+    function getResult($connection, $nodeName, $filteredNames, $severityStatuses)
     {
         $date = new DateTime();
         $today = $date->format('d-m-Y');
 
         if ($stmt = $connection->prepare("SELECT name,object_id,status FROM object_properties WHERE name=?")) {
-            $stmt->bind_param("s", $dataname);
+            $stmt->bind_param("s", $nodeName);
             $stmt->execute();
             $result = $stmt->get_result();
             $objectProperties = $result->fetch_assoc();
 
             $stmt->close();
         } else {
-            return ['error' => $dataname . ' not found'];
+            return ['error' => $nodeName . ' not found'];
         }
 
-        $sqlStatus = "SELECT  DATE_FORMAT(FROM_UNIXTIME(MAX(`event_timestamp`)), '%H:%i:%s %e-%m-%Y') as event_timestamp, `event_name`, `event_code`,`severity`,`message` FROM alarm_events 
-        WHERE source_object_id = {$objectProperties['object_id']} GROUP BY severity";
+        $sqlStatus = "SELECT  DATE_FORMAT(FROM_UNIXTIME(MAX(`event_timestamp`)), '%H:%i:%s %e-%m-%Y') as event_timestamp,
+                    `event_name`, 
+                    `event_code`,
+                    `severity`,
+                    `message` 
+        FROM alarm_events 
+        WHERE source_object_id = {$objectProperties['object_id']}
+        GROUP BY severity";
 
 
         if ($resultStatus = $connection->query($sqlStatus)) {
@@ -141,7 +148,7 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
         return ['object_properties' => $objectProperties, 'alarm_events' => $resultStatus, 'idata' => $resultValuesData];
     }
 
-    $results = getResult($connection, $dataname, $filteredNames, $severityStatuses);
+    $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses);
 
     if (isset($results['error'])) {
         echo $results['error'];
