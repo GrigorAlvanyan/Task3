@@ -1,6 +1,6 @@
 <?php
 error_reporting(E_ALL);
-//session_start();
+
 
 function dd($res)
 {
@@ -45,7 +45,7 @@ if (!$connection) {
 if (isset($_GET['name']) && !empty($_GET['name'])) {
 
     $nodeName = $_GET['name'];
-    $_SESSION['name'] = $nodeName;
+    
 }
 else{
 	$nodeName = $personalinfo[2];
