@@ -11,13 +11,11 @@ function dd($res)
 
 $url = $_SERVER['HTTP_HOST'];
 if($url == 'localhost'){
-
     $host = 'localhost';
     $user = 'root';
     $password = '';
 
 }else{
-
     $host = '10.1.1.41';
     $user = 'root';
     $password = '1234';
@@ -37,6 +35,7 @@ $severityStatuses = [
 ];
 
 $connection = mysqli_connect($host, $user, $password, $dbname);
+//dd($connection);die;
 
 if (!$connection) {
     echo "Error: Unable to connect to MySQL. Please check your DB connection parameters.\n";
@@ -77,7 +76,6 @@ function getResult($connection, $nodeName, $filteredNames, $severityStatuses)
         WHERE source_object_id = {$objectProperties['object_id']}
         GROUP BY severity";
 
-
         if ($resultStatus = $connection->query($sqlStatus)) {
             $resultStatus = $resultStatus->fetch_all(MYSQLI_ASSOC);
 
@@ -94,7 +92,7 @@ function getResult($connection, $nodeName, $filteredNames, $severityStatuses)
 
             }
         } else {
-            return ['error' => 'Result status not found'];
+//            return ['error' => 'Result status not found'];
         }
 
         $objectId = $objectProperties['object_id'];
@@ -187,7 +185,7 @@ for ($i = 0; $i < count($severityMax); $i++) {
     }
 }
 
-$severityName = isset($severityMax[$item]) && isset($severityMax[$item]['severity_name']) ? $severityMax[$item]['severity_name'] : '';
+$severityName = isset($severityMax[$item]) && isset($severityMax[$item]['severity_name']) ? $severityMax[$item]['severity_name'] : 'normal';
 
 
 // 733 - Врем. доступ
@@ -200,10 +198,6 @@ $severityName = isset($severityMax[$item]) && isset($severityMax[$item]['severit
 				// 261 - За месяц
 				// 262 - За всё время
 				// 263 - Турбо
-
-
-    if(isset($results['alarm_events']))
-    {
         echo "</table><table class='table_1'> 
 		<tr>
 		    <th colspan=2><b>Узел</b></th>			
@@ -218,6 +212,8 @@ $severityName = isset($severityMax[$item]) && isset($severityMax[$item]['severit
 			<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_".$severityName.".png' alt='".$severityName."'></td>
 		</tr>";
 
+    if(isset($results['alarm_events']))
+    {
         foreach($results['alarm_events'] as $value)
 
         {
