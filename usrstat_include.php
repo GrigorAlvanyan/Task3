@@ -9,9 +9,20 @@ function dd($res)
     echo '</pre>';
 }
 
-$host = 'localhost';
-$user = 'root';
-$password = '';
+$url = $_SERVER['HTTP_HOST'];
+if($url == 'localhost'){
+
+    $host = 'localhost';
+    $user = 'root';
+    $password = '';
+
+}else{
+
+    $host = '10.1.1.41';
+    $user = 'root';
+    $password = '1234';
+}
+
 $dbname = 'netxms';
 $nodeName = '';
 
@@ -40,7 +51,8 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
 else{
 	$nodeName = $personalinfo[2];
 }
-    function getResult($connection, $nodeName, $filteredNames, $severityStatuses)
+
+function getResult($connection, $nodeName, $filteredNames, $severityStatuses)
     {
         $date = new DateTime();
         $today = $date->format('d-m-Y');
@@ -159,26 +171,26 @@ else{
     }
 
 
-
-
 $connection->close();
 
 
-    $severityMax = $results['alarm_events'];
-    $max = 0;
-    for ($i = 0; $i < count($severityMax); $i++) {
+$severityMax = $results['alarm_events'] ?? [];
+$max = 0;
+$item = 0;
+for ($i = 0; $i < count($severityMax); $i++) {
 
-        if ($severityMax[$i]['severity'] > $max) {
-            $max = $severityMax[$i]['severity'];
-            $item = $i;
-        } else {
-            continue;
-        }
+    if ($severityMax[$i]['severity'] > $max) {
+        $max = $severityMax[$i]['severity'];
+        $item = $i;
+    } else {
+        continue;
     }
+}
+
+$severityName = isset($severityMax[$item]) && isset($severityMax[$item]['severity_name']) ? $severityMax[$item]['severity_name'] : '';
 
 
-
-				// 733 - Врем. доступ
+// 733 - Врем. доступ
 				// 255 - Трафик
 				// 256 - Ограничение
 				// 257 - Тек. скорость
@@ -188,7 +200,11 @@ $connection->close();
 				// 261 - За месяц
 				// 262 - За всё время
 				// 263 - Турбо
-    echo "</table><table class='table_1'> 
+
+
+    if(isset($results['alarm_events']))
+    {
+        echo "</table><table class='table_1'> 
 		<tr>
 		    <th colspan=2><b>Узел</b></th>			
 		</tr>
@@ -198,12 +214,12 @@ $connection->close();
 		</tr>
 		<tr>
 			<td class='even_th'>Статус:</td>
-			<td>"."$max"."</td>
-			<td style='padding:0;width:15px;text-align:center'>".$isConnected."<img width=16 src='img/err_" . $severityMax[$item]['severity_name'] . ".png' alt='" . $severityMax[$item]['severity_name'] . "'></td>
+			<td>".$severityStatuses[$max]."</td>
+			<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_".$severityName.".png' alt='".$severityName."'></td>
 		</tr>";
-    if(isset($results['alarm_events']))
-    {
+
         foreach($results['alarm_events'] as $value)
+
         {
             echo  "<tr>
 					    <td class='even_th'><b>Тревога</b>:</td>
