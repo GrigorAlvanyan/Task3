@@ -242,6 +242,7 @@ $name = isset($results['object_properties']) && isset($results['object_propertie
         foreach($results['idata'] as $value)
         {
             $val = getStatus($idataValues, $value['idata_value']);
+            $val = isset($val) ? $val : 'N/A';
             echo "<tr>
 						<td class='even_th' >".$value['description']."</td>
 						<td>".$val."</td>
