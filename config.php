@@ -17,9 +17,9 @@ return [
         'values'=>'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',
+        'host' => 'localhost', //10.1.1.41
         'user' =>'root',
-        'password' => '1234',
+        'password' => '', //1234
         'db_name'=> 'netxms'
     ],
     'idata_values' => [
@@ -40,7 +40,41 @@ return [
         'critical' => [
             'min' => 31,
         ],
+    ],
+    'description'=>[
+        "TV LASER"=>[
+            'normal' => [
+                'min' => 1,
+                'max' => 10,
+            ],
+            'major'=>[
+                'min' => 1,
+                'max' => 10,
+            ]
+        ],
+        "Temperature"=>[
+            'normal' => [
+                'min' => 1,
+                'max' => 10,
+            ],
+            'major'=>[
+                'min' => 1,
+                'max' => 10,
+            ]
+        ],
+        "Att-1"=>[
+            'normal' => [
+                'min' => 1,
+                'max' => 10,
+            ],
+            'major'=>[
+                'min' => 1,
+                'max' => 10,
+            ]
+        ]
     ]
+
+
 
 ];
 

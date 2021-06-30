@@ -198,6 +198,7 @@ function getResult($connection, $nodeName, $filteredNames, $severityStatuses, $s
 
     $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
 
+
 if (isset($results['error'])) {
     echo $results['error'];die;
 } else {
@@ -221,7 +222,7 @@ $name = isset($results['object_properties']) && isset($results['object_propertie
 		</tr>
 		<tr>
 			<td class='even_th'>Статус:</td>
-			<td>".$status."</td>
+			<td>".$severity."</td>
 			<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_".$severity.".png' alt='".$severity."' title='{$severity}'></td>
 		</tr>";
 
