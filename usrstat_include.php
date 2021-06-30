@@ -241,12 +241,19 @@ $name = isset($results['object_properties']) && isset($results['object_propertie
     {
         foreach($results['idata'] as $value)
         {
+            $valImg = '';
             $val = getStatus($idataValues, $value['idata_value']);
             $val = isset($val) ? $val : 'N/A';
+            if($val == 'minor' || $val == 'major' || $val == 'normal' || $val == 'critical'){
+                $valImg = $val;
+            }
+
+
+
             echo "<tr>
 						<td class='even_th' >".$value['description']."</td>
-						<td>".$val."</td>
-						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_".$val.".png' alt='{$val}' title='{$val}'></td>
+						<td>".$value['idata_value']."</td>
+						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_".$valImg.".png' alt='{$valImg}' title='{$valImg}'></td>
 					</tr>";
         }
     }
