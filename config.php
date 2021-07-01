@@ -9,71 +9,196 @@ return [
         '4' => 'critical'
     ],
     'error_messages' => [
-        'not_name'=>'Result with name: :name not found, line:',
-        'node_name'=> ' not found, line:',
-        'status'=>'Result status not found, line:',
-        'items'=>'Result items not found, line:',
-        'table'=>' table not found, line:',
-        'values'=>'Result values not found, line:'
+        'not_name' => 'Result with name: :name not found, line:',
+        'node_name' => ' not found, line:',
+        'status' => 'Result status not found, line:',
+        'items' => 'Result items not found, line:',
+        'table' => ' table not found, line:',
+        'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => 'localhost', //10.1.1.41
-        'user' =>'root',
-        'password' => '', //1234
-        'db_name'=> 'netxms'
+        'host' => '10.1.1.41', //10.1.1.41
+        'user' => 'root',
+        'password' => '1234', //1234
+        'db_name' => 'netxms'
     ],
-    'idata_values' => [
-        'normal' => [
-            'min' => 1,
-            'max' => 10,
-        ],
-        'minor' => [
-            'min' => 11,
-            'max' => 20,
-            'minus_min' => -1,
-            'minus_max' => -10,
-        ],
-        'major' => [
-            'min' => 21,
-            'max' => 30,
-        ],
-        'critical' => [
-            'min' => 31,
-        ],
-    ],
-    'description'=>[
-        "TV LASER"=>[
+    'filteredNames' => [],
+    'idata_ranges' => [
+        "TV Laser" => [
             'normal' => [
-                'min' => 1,
-                'max' => 10,
+                [
+                    'min' => -5,
+                    'max' => 4
+                ],
+                [
+                    'min' => 5,
+                    'max' => 7
+                ],
+                [
+                    'min' => 9,
+                    'max' => 11
+                ],
             ],
-            'major'=>[
-                'min' => 1,
-                'max' => 10,
-            ]
+            'minor' => [
+                [
+                    'min' => 12,
+                    'max' => 15
+                ],
+                [
+                    'min' => 17,
+                    'max' => 22
+                ],
+                [
+                    'min' => 26,
+                    'max' => 33
+                ],
+            ],
+            'major' => [
+                [
+                    'min' => 38,
+                    'max' => 39
+                ],
+                [
+                    'min' => 41,
+                    'max' => 45
+                ],
+                [
+                    'min' => 46,
+                    'max' => 48
+                ],
+            ],
+            'critical' => [
+                [
+                    'min' => 111,
+                    'max' => 555
+                ],
+                [
+                    'min' => 5555,
+                    'max' => 10000000
+                ],
+                [
+                    'min' => 9999,
+                    'max' => 10000000
+                ],
+            ],
         ],
-        "Temperature"=>[
+        "Temperature" => [
             'normal' => [
-                'min' => 1,
-                'max' => 10,
+                [
+                    'min' => 11111111,
+                    'max' => 66666
+                ],
+                [
+                    'min' => 114,
+                    'max' => 116
+                ],
+                [
+                    'min' => 119,
+                    'max' => 121
+                ],
             ],
-            'major'=>[
-                'min' => 1,
-                'max' => 10,
-            ]
+            'minor' => [
+                [
+                    'min' => 126,
+                    'max' => 129
+                ],
+                [
+                    'min' => 132,
+                    'max' => 136
+                ],
+                [
+                    'min' => 139,
+                    'max' => 142
+                ],
+            ],
+            'major' => [
+                [
+                    'min' => 62,
+                    'max' => 63
+                ],
+                [
+                    'min' => 17,
+                    'max' => 22
+                ],
+                [
+                    'min' => 26,
+                    'max' => 33
+                ],
+            ],
+            'critical' => [
+                [
+                    'min' => 68,
+                    'max' => 72
+                ],
+                [
+                    'min' => 333,
+                    'max' => 10000000
+                ],
+                [
+                    'min' => 555,
+                    'max' => 10000000
+                ],
+            ],
         ],
-        "Att-1"=>[
+        "Att-2" => [
             'normal' => [
-                'min' => 1,
-                'max' => 10,
+                [
+                    'min' => 11,
+                    'max' => 14
+                ],
+                [
+                    'min' => 17,
+                    'max' => 22
+                ],
+                [
+                    'min' => 26,
+                    'max' => 33
+                ],
             ],
-            'major'=>[
-                'min' => 1,
-                'max' => 10,
+            'minor' => [
+                [
+                    'min' => 11,
+                    'max' => 14
+                ],
+                [
+                    'min' => 17,
+                    'max' => 22
+                ],
+                [
+                    'min' => 26,
+                    'max' => 33
+                ],
+            ],
+            'major' => [
+                [
+                    'min' => 3,
+                    'max' => 9
+                ],
+                [
+                    'min' => 17,
+                    'max' => 22
+                ],
+                [
+                    'min' => 26,
+                    'max' => 33
+                ],
+            ],
+            'critical' => [
+                [
+                    'min' => 65,
+                    'max' => 100,
+                ],
+                [
+                    'min' => 8883,
+                    'max' => 10000000
+                ],
+                [
+                    'min' => 11114,
+                    'max' => 10000000
+                ],
             ]
         ]
     ]
-
 
 
 ];
