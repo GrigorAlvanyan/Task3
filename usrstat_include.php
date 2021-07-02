@@ -286,6 +286,16 @@ echo "</table><table class='table_1'>
 			<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $severity . ".png' alt='" . $severity . "' title='{$severity}'></td>
 		</tr>";
 
+
+$statuses = [];
+foreach ($configIdataRanges as $rangeDescription => $values) {
+    foreach ($values as $key => $item) {
+        if (!in_array($key, $statuses)) {
+            $statuses[] = $key;
+        }
+    }
+}
+
 if (isset($results['alarm_events'])) {
     foreach ($results['alarm_events'] as $value) {
         echo "<tr>
@@ -300,19 +310,21 @@ if (isset($results['idata'])) {
 
     foreach ($results['idata'] as $value) {
 
-        $valImg = '';
-        $val = getStatuses($configIdataRanges, $value['idata_value'], $value['description']);
+        $valueImg = '';
+        $valueSeverityStatuses = getStatuses($configIdataRanges, $value['idata_value'], $value['description']);
 
-        $valueStatus = isset($val) ? $val : '';
+        $valueStatus = isset($valueSeverityStatuses) ? $valueSeverityStatuses : '';
 
-        if ($valueStatus == 'minor' || $valueStatus == 'major' || $valueStatus == 'normal' || $valueStatus == 'critical') {
-            $valImg = $valueStatus;
+        for ($i = 0; $i < count($statuses); $i++) {
+            if ($valueStatus == $statuses[$i]) {
+                $valueImg = $valueStatus;
+            }
         }
 
         echo "<tr>
 						<td class='even_th' >" . $value['description'] . "</td>
 						<td>" . $value['idata_value'] . "</td>
-						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $valImg . ".png' alt='{$valImg}' title='{$valImg}'></td>
+						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $valueImg . ".png' alt='{$valueImg}' title='{$valueImg}'></td>
 					</tr>";
     }
 }
