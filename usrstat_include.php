@@ -14,6 +14,7 @@ $severityValue = [];
 
 $connection = mysqli_connect($configs['db_params']['host'], $configs['db_params']['user'], $configs['db_params']['password'], $configs['db_params']['db_name']);
 
+
 if (!$connection) {
     echo "Error: Unable to connect to MySQL. Please check your DB connection parameters.\n";
     exit;
@@ -196,15 +197,18 @@ function getStatuses($configIdataRanges, $itemValue, $description)
 
     foreach ($configIdataRanges as $rangeDescription => $values) {
         if ($description == $rangeDescription) {
+            $statusValueMax = '';
             foreach ($values as $key => $value) {
 
                 foreach ($value as $item){
 
                     if ($itemValue >= $item['min'] && $itemValue <= $item['max']) {
-                        return $key;
+                        $statusValueMax = $key;
                     }
                 }
+
             }
+            return $statusValueMax;
         }
     }
 }
@@ -312,14 +316,14 @@ if (isset($results['idata'])) {
 
         $valueImg = '';
         $valueSeverityStatuses = getStatuses($configIdataRanges, $value['idata_value'], $value['description']);
-
         $valueStatus = isset($valueSeverityStatuses) ? $valueSeverityStatuses : '';
 
         for ($i = 0; $i < count($statuses); $i++) {
             if ($valueStatus == $statuses[$i]) {
-                $valueImg = $valueStatus;
+                $valueImg = $valueStatus;;
             }
         }
+
 
         echo "<tr>
 						<td class='even_th' >" . $value['description'] . "</td>

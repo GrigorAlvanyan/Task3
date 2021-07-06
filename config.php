@@ -17,9 +17,9 @@ return [
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',
+        'host' => 'localhost',//10.1.1.41
         'user' => 'root',
-        'password' => '1234',
+        'password' => '',//1234
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],
@@ -99,8 +99,8 @@ return [
             ],
             'minor' => [
                 [
-                    'min' => 126,
-                    'max' => 129
+                    'min' => 68,
+                    'max' => 72
                 ],
                 [
                     'min' => 132,
@@ -143,8 +143,8 @@ return [
         "Att-2" => [
             'normal' => [
                 [
-                    'min' => 11,
-                    'max' => 14
+                    'min' => 44,
+                    'max' => 55
                 ],
                 [
                     'min' => 17,
@@ -157,8 +157,8 @@ return [
             ],
             'minor' => [
                 [
-                    'min' => 11,
-                    'max' => 14
+                    'min' => 4,
+                    'max' => 6
                 ],
                 [
                     'min' => 17,
@@ -171,22 +171,22 @@ return [
             ],
             'major' => [
                 [
-                    'min' => -5,
-                    'max' => 9
+                    'min' => 21,
+                    'max' => 26
                 ],
                 [
                     'min' => 17,
                     'max' => 22
                 ],
                 [
-                    'min' => 26,
-                    'max' => 33
+                    'min' => 444,
+                    'max' => 6662
                 ],
             ],
             'critical' => [
                 [
-                    'min' => 65,
-                    'max' => 100,
+                    'min' => 4,
+                    'max' => 6
                 ],
                 [
                     'min' => 8883,
