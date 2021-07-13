@@ -17,9 +17,9 @@ return [
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',//10.1.1.41
+        'host' => 'localhost',//10.1.1.41
         'user' => 'root',
-        'password' => '1234',//1234
+        'password' => '',//1234
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],
@@ -143,8 +143,8 @@ return [
         "Att-2" => [
             'normal' => [
                 [
-                    'min' => 44,
-                    'max' => 55
+                    'min' => 4,
+                    'max' => 6
                 ],
                 [
                     'min' => 17,

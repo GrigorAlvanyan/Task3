@@ -25,6 +25,103 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
     $nodeName = $personalinfo[2];
 }
 
+//$eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
+if(isset($personalinfo[43])) {
+    if (strpos($personalinfo[43], "7375828706861857")) {
+        $eoc_mac = (substr(substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857")), -19, 17));
+        $macAddressesValue = getMaccAddress($connection,$eoc_mac);
+    }
+}else{
+    if (isset($_GET['mac']) && !empty($_GET['mac'])) {
+        $macName = $_GET['mac'];
+        if(strlen(implode('', explode(':', trim($macName)))) == 12){
+            $eoc_mac = implode('', explode(':', trim($macName)));
+            $macAddressesValue = getMaccAddress($connection,$eoc_mac);
+        }
+    }
+}
+
+function getMaccAddress($connection, $eoc_mac)
+{
+    $macAddressTables = [];
+    $sql = "SELECT DISTINCT item_id FROM tdata_78528 ";
+    if ($tableIdValues = $connection->query($sql)) {
+        $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
+        foreach ($tableIdValues as $resultItem) {
+            $sqlFin = "SELECT `item_id`, `tdata_timestamp`, `tdata_value`          
+                    FROM tdata_78528 
+                    WHERE item_id = {$resultItem['item_id']} 
+                    ORDER BY `tdata_timestamp` DESC  LIMIT 1";
+
+            if ($resultValues = $connection->query($sqlFin)) {
+                $resultValues = $resultValues->fetch_all(MYSQLI_ASSOC);
+
+                foreach ($resultValues as $value) {
+
+                    $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
+                    if (empty($htmlTable)) {
+                        $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
+                        if (empty($htmlTable)) {
+                            echo 'error offset ';
+                            die;
+                        }
+                    }
+
+                    $doc = new DOMDocument();
+                    libxml_use_internal_errors(true);
+                    @$doc->loadHTML($htmlTable);
+                    libxml_clear_errors();
+                    $doc->preserveWhiteSpace = false;
+                    $table = $doc->getElementsByTagName('table');
+                    $tableName = $table->item(0)->getAttribute("name");
+                    $column = $doc->getElementsByTagName('column');
+                    $columnCount = count($column);
+                    if ($columnCount > 2) {
+                        $columnArr = [];
+                        for ($i = 2; $i < count($column); $i++) {
+                            $i = $column->item($i)->getAttribute("name");
+                            $columnArr[] = $i;
+                        }
+                        $col = $columnArr;
+                    }
+
+
+                    $rows = $table->item(0)->getElementsByTagName('tr');
+                    foreach ($rows as $row) {
+
+
+                        $cols = $row->getElementsByTagName('td');
+                        if ($cols[1]->nodeValue == $eoc_mac) {
+                            $macAddressTable = [];
+                            $mac = '';
+                            $mac = 'MAC:' . $cols[1]->nodeValue . ' ';
+
+                            $item = 0;
+                            $tablesName = [
+                                'id' => $resultItem['item_id'],
+                                'Table_Name' => $tableName,
+                                'MAC' => $mac,
+                            ];
+
+                            for ($i = 2; $i < $columnCount; $i++) {
+                                $val = "{$col[$item]}:" . $cols[$i]->nodeValue . ' ';
+
+                                $tablesName["{$col[$item]}"] = $val;
+                            }
+                            $macAddressTable = $tablesName;
+                            $macAddressTables[] = $macAddressTable;
+                        }
+                    }
+                }
+            }
+        }
+        return $macAddressTables;
+    } else {
+        return 'Result macAddress not found, line:' . __LINE__;
+        die;
+    }
+}
+
 function getObjectProperties($connection, $nodeName, $errorsMessage)
 {
     $returnData = [
@@ -52,28 +149,30 @@ function getObjectProperties($connection, $nodeName, $errorsMessage)
 }
 
 
-function getSeverityValues($resultStatus)
+function getSeverityValues($resultStatus, $severityStatuses)
 {
+    $severityName = '';
     $severityMax = (!empty($resultStatus)) ? $resultStatus : [];
 
     $max = 0;
-    $item = 0;
     for ($i = 0; $i < count($severityMax); $i++) {
 
         if ($severityMax[$i]['severity'] > $max) {
             $max = $severityMax[$i]['severity'];
-            $item = $i;
-        } else {
-            continue;
         }
     }
-    $severityName = (isset($severityMax[$item]) && isset($severityMax[$item]['severity_name'])) ? $severityMax[$item]['severity_name'] : 'normal';
+
+    foreach ($severityStatuses as $key => $value) {
+        if ($max == $key) {
+            $severityName = $value;
+        }
+    }
 
     return $severityValue = [
         'max' => $max,
-        'item' => $item,
         'severityName' => $severityName
     ];
+
 }
 
 
@@ -90,8 +189,7 @@ function getSeverity($connection, $objectProperties, $severityStatuses, $today, 
 
     if ($resultStatus = $connection->query($sqlStatus)) {
         $resultStatus = $resultStatus->fetch_all(MYSQLI_ASSOC);
-
-        $severityValue = getSeverityValues($resultStatus);
+        $severityValue = getSeverityValues($resultStatus, $severityStatuses);
 
         foreach ($resultStatus as &$severity) {
 
@@ -162,7 +260,7 @@ function getIdata($connection, $itemIds, $today, $idataTable, $errorsMessage)
                         `template_id`, 
                         `template_item_id`, 
                         `guid`, 
-                        `name` , 
+                        `name`, 
                         `description`
         FROM {$idataTable} 
         INNER JOIN items ON {$idataTable}.item_id = items.item_id 
@@ -197,21 +295,18 @@ function getStatuses($configIdataRanges, $itemValue, $description)
 
     foreach ($configIdataRanges as $rangeDescription => $values) {
         if ($description == $rangeDescription) {
-            $statusValueMax = '';
             foreach ($values as $key => $value) {
-
-                foreach ($value as $item){
-
+                foreach ($value as $item) {
                     if ($itemValue >= $item['min'] && $itemValue <= $item['max']) {
-                        $statusValueMax = $key;
+                        return $key;
                     }
                 }
-
             }
-            return $statusValueMax;
         }
     }
 }
+
+
 
 
 
@@ -261,7 +356,6 @@ function getResult($connection, $nodeName, $filteredNames, $severityStatuses, $s
 }
 
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
-
 if (isset($results['error'])) {
     echo $results['error'];
     die;
@@ -275,22 +369,6 @@ $status = isset($results['severityValue']) && isset($results['severityValue']['m
 $severity = isset($results['severityValue']) && isset($results['severityValue']['severityName']) ? $results['severityValue']['severityName'] : '';
 $name = isset($results['object_properties']) && isset($results['object_properties']['name']) ? $results['object_properties']['name'] : '';
 
-echo "</table><table class='table_1'> 
-		<tr>
-		    <th colspan=2><b>Узел</b></th>			
-		</tr>
-		
-		<tr>
-			<td class='even_th' style='width:110px'>Имя:</td>
-			<td colspan=2>" . $name . "</td>
-		</tr>
-		<tr>
-			<td class='even_th'>Статус:</td>
-			<td>" . $severity . "</td>
-			<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $severity . ".png' alt='" . $severity . "' title='{$severity}'></td>
-		</tr>";
-
-
 $statuses = [];
 foreach ($configIdataRanges as $rangeDescription => $values) {
     foreach ($values as $key => $item) {
@@ -300,39 +378,99 @@ foreach ($configIdataRanges as $rangeDescription => $values) {
     }
 }
 
-if (isset($results['alarm_events'])) {
-    foreach ($results['alarm_events'] as $value) {
-        echo "<tr>
-					    <td class='even_th'><b>Тревога</b>:</td>
-						<td>" . $value['message'] . " " . $value['event_timestamp'] . "</td>
-						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $value['severity_name'] . ".png' alt='{$value['severity_name']}' title='{$severity}'></td>
-					</tr>";
-    }
-}
-
-if (isset($results['idata'])) {
-
-    foreach ($results['idata'] as $value) {
-
-        $valueImg = '';
-        $valueSeverityStatuses = getStatuses($configIdataRanges, $value['idata_value'], $value['description']);
-        $valueStatus = isset($valueSeverityStatuses) ? $valueSeverityStatuses : '';
-
-        for ($i = 0; $i < count($statuses); $i++) {
-            if ($valueStatus == $statuses[$i]) {
-                $valueImg = $valueStatus;;
-            }
-        }
-
-
-        echo "<tr>
-						<td class='even_th' >" . $value['description'] . "</td>
-						<td>" . $value['idata_value'] . "</td>
-						<td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_" . $valueImg . ".png' alt='{$valueImg}' title='{$valueImg}'></td>
-					</tr>";
-    }
-}
-
-echo "</table>";
+$excludeKeys = [
+    'id',
+    'Table_Name',
+    'MAC',
+];
 
 ?>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Узел</title>
+</head>
+<body>
+<table class='table_1'>
+    <tr>
+        <th colspan=2><b>Узел</b></th>
+    </tr>
+    <tr>
+        <td class='even_th' style='width:110px'>Имя:</td>
+        <td colspan=2><?= $name ?></td>
+    </tr>
+    <tr>
+        <td class='even_th'>Статус:</td>
+        <td><?= $severity ?></td>
+        <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $severity ?>.png'
+                                                                alt='<?= $severity ?>' title='<?= $severity ?>'></td>
+    </tr>
+
+    <?php if (isset($results['alarm_events'])) : ?>
+        <?php foreach ($results['alarm_events'] as $value)  : ?>
+            <tr>
+                <td class='even_th'><b>Тревога</b>:</td>
+                <td><?= $value['message'] . " " . $value['event_timestamp'] ?></td>
+                <td style='padding:0;width:15px;text-align:center'><img width=16
+                                                                        src='img/err_<?= $value['severity_name'] ?>.png'
+                                                                        alt='<?= $value['severity_name'] ?>'
+                                                                        title='<?= $severity ?>'></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <?php if (isset($results['idata'])) : ?>
+        <?php foreach ($results['idata'] as $value) : ?>
+            <?php $valueImg = '';
+            $valueSeverityStatuses = getStatuses($configIdataRanges, $value['idata_value'], $value['description']);
+            $valueStatus = isset($valueSeverityStatuses) ? $valueSeverityStatuses : '';
+            for ($i = 0; $i < count($statuses); $i++) {
+                if ($valueStatus == $statuses[$i]) {
+                    $valueImg = $valueStatus;;
+                }
+            }
+            ?>
+            <tr>
+                <td class='even_th'><?= $value['description'] ?></td>
+                <td><?= $value['idata_value'] ?></td>
+                <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $valueImg ?>.png'
+                                                                        alt='<?= $valueImg ?>' title='<?= $valueImg ?>'>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <?php if (isset($macAddressesValue) && !empty($macAddressesValue)) : ?>
+        <?php foreach ($macAddressesValue as $line) : ?>
+            <?php
+            $tdValues = [];
+            foreach ($line as $key => $str) {
+                $strValue = '';
+                if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
+                    $strValue = $str;
+                    $tdValues[] = $strValue;
+                }
+            }
+
+            ?>
+            <tr style="vertical-align: top;">
+                <td class='even_th'><?= $line['id'] ?></td>
+                <td><?= $line['Table_Name'] ?></td>
+                <td>
+                    <?php foreach ($tdValues as $td) : ?>
+                        <?= $td ?>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+</table>
+</body>
+</html>
+
