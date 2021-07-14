@@ -17,9 +17,9 @@ return [
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',//10.1.1.41
+        'host' => '10.1.1.41',
         'user' => 'root',
-        'password' => '1234',//1234
+        'password' => '1234',
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],

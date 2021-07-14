@@ -104,7 +104,7 @@ function getMaccAddress($connection, $eoc_mac)
                             ];
                             for ($i = 2; $i < $columnCount; $i++) {
 
-                                $val = "{$col[$item]}:" . $cols->item($i)->nodeValue . ' ';
+                                $val = $cols->item($i)->nodeValue . ' ';
                                 $tablesName["{$col[$item]}"] = $val;
                             }
                             $macAddressTable = $tablesName;
@@ -123,19 +123,21 @@ function getMaccAddress($connection, $eoc_mac)
 
 function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName, $tableName)
 {
-
+    $dispName = '';
     if (!is_numeric($displayNameValue)) {
         return $displayNameValue;
     }
 
     foreach ($configTdataRanges as $rangeTabName => $values) {
+
         if ($tableName == $rangeTabName) {
             foreach ($values as $key => $value) {
+
                 if ($displayName == $key) {
                     foreach ($value as $item) {
                         if ($displayNameValue >= $item['min'] && $displayNameValue <= $item['max']) {
-
-                            return $displayNameValue;
+                            $dispName = $key . ':' . $displayNameValue;
+                            return $dispName;
                         }
                     }
                 }
@@ -314,6 +316,7 @@ function getStatuses($configIdataRanges, $itemValue, $description)
         return $itemValue;
     }
 
+
     foreach ($configIdataRanges as $rangeDescription => $values) {
         if ($description == $rangeDescription) {
             foreach ($values as $key => $value) {
@@ -482,12 +485,12 @@ $excludeKeys = [
                 $name = '';
                 $strValue = '';
                 if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
-                    $displayNameValue = $str;
+                    $displayNameValue = (int) $str;
                     $name = $key;
                     $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
-                    if (isset($macValueStatuses) && !empty($macValueStatuses)) {
-                        $strValue =  $macValueStatuses . '<br>';
 
+                    if (isset($macValueStatuses) && !empty($macValueStatuses)) {
+                        $strValue = $macValueStatuses . '<br>';
                     }
                     $tdValues[] = $strValue;
                 }
