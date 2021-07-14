@@ -17,9 +17,9 @@ return [
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => 'localhost',//10.1.1.41
+        'host' => '10.1.1.41',//10.1.1.41
         'user' => 'root',
-        'password' => '',//1234
+        'password' => '1234',//1234
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],
@@ -198,9 +198,53 @@ return [
                 ],
             ]
         ]
+    ],
+    'tdata_ranges' => [
+        "Wec TX Signal" => [
+            'TX' => [
+                [
+                    'min' => 254,
+                    'max' => 256
+                ],
+                [
+                    'min' => 1,
+                    'max' => 256
+                ],
+            ],
+            'RX' => [
+                [
+                    'min' => 1,
+                    'max' => 256
+                ],
+                [
+                    'min' => 10,
+                    'max' => 256
+                ],
+            ]
+        ],
+        "Wec RX Signal" => [
+            'TX' => [
+                [
+                    'min' => 10,
+                    'max' => 256
+                ],
+                [
+                    'min' => 254,
+                    'max' => 256
+                ],
+            ],
+            'RX' => [
+                [
+                    'min' => 23,
+                    'max' => 256
+                ],
+                [
+                    'min' => 1,
+                    'max' => 33
+                ],
+            ]
+        ]
     ]
-
-
 ];
 
 

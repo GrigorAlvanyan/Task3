@@ -1,4 +1,5 @@
 <?php
+//phpinfo();
 error_reporting(E_ALL);
 require_once 'helpers.php';
 $configs = include 'config.php';
@@ -7,6 +8,7 @@ $severityStatuses = $configs['severityStatuses'];
 $errorsMessage = $configs['error_messages'];
 $configIdataRanges = $configs['idata_ranges'];
 $filteredNames = $configs['filteredNames'];
+$configTdataRanges = $configs['tdata_ranges'];
 
 
 $nodeName = '';
@@ -26,21 +28,21 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
 }
 
 //$eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
-if(isset($personalinfo[43])) {
-    if (strpos($personalinfo[43], "7375828706861857")) {
-        $eoc_mac = (substr(substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857")), -19, 17));
+if (isset($_GET['mac']) && !empty($_GET['mac'])) {
+    $macName = $_GET['mac'];
+    if(strlen(implode('', explode(':', trim($macName)))) == 12){
+        $eoc_mac = implode('', explode(':', trim($macName)));
         $macAddressesValue = getMaccAddress($connection,$eoc_mac);
-    }
-}else{
-    if (isset($_GET['mac']) && !empty($_GET['mac'])) {
-        $macName = $_GET['mac'];
-        if(strlen(implode('', explode(':', trim($macName)))) == 12){
-            $eoc_mac = implode('', explode(':', trim($macName)));
-            $macAddressesValue = getMaccAddress($connection,$eoc_mac);
+        }
+}else {
+    if (isset($personalinfo[43])) {
+        if (strpos($personalinfo[43], "375828706861857")) {
+            $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
+            $eoc_mac = $eoc_tmp_array[2];
+            $macAddressesValue = getMaccAddress($connection, $eoc_mac);
         }
     }
 }
-
 function getMaccAddress($connection, $eoc_mac)
 {
     $macAddressTables = [];
@@ -75,26 +77,24 @@ function getMaccAddress($connection, $eoc_mac)
                     $table = $doc->getElementsByTagName('table');
                     $tableName = $table->item(0)->getAttribute("name");
                     $column = $doc->getElementsByTagName('column');
-                    $columnCount = count($column);
+                    $columnCount = $column->length;
+
                     if ($columnCount > 2) {
                         $columnArr = [];
-                        for ($i = 2; $i < count($column); $i++) {
-                            $i = $column->item($i)->getAttribute("name");
-                            $columnArr[] = $i;
+                        for ($i = 2; $i < $columnCount; $i++) {
+                            $columnArr[] = $column->item($i)->getAttribute("name");
                         }
                         $col = $columnArr;
                     }
 
-
                     $rows = $table->item(0)->getElementsByTagName('tr');
                     foreach ($rows as $row) {
 
-
                         $cols = $row->getElementsByTagName('td');
-                        if ($cols[1]->nodeValue == $eoc_mac) {
+                        if ($cols->item(1)->nodeValue == $eoc_mac) {
                             $macAddressTable = [];
                             $mac = '';
-                            $mac = 'MAC:' . $cols[1]->nodeValue . ' ';
+                            $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
 
                             $item = 0;
                             $tablesName = [
@@ -102,10 +102,9 @@ function getMaccAddress($connection, $eoc_mac)
                                 'Table_Name' => $tableName,
                                 'MAC' => $mac,
                             ];
-
                             for ($i = 2; $i < $columnCount; $i++) {
-                                $val = "{$col[$item]}:" . $cols[$i]->nodeValue . ' ';
 
+                                $val = "{$col[$item]}:" . $cols->item($i)->nodeValue . ' ';
                                 $tablesName["{$col[$item]}"] = $val;
                             }
                             $macAddressTable = $tablesName;
@@ -119,6 +118,29 @@ function getMaccAddress($connection, $eoc_mac)
     } else {
         return 'Result macAddress not found, line:' . __LINE__;
         die;
+    }
+}
+
+function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName, $tableName)
+{
+
+    if (!is_numeric($displayNameValue)) {
+        return $displayNameValue;
+    }
+
+    foreach ($configTdataRanges as $rangeTabName => $values) {
+        if ($tableName == $rangeTabName) {
+            foreach ($values as $key => $value) {
+                if ($displayName == $key) {
+                    foreach ($value as $item) {
+                        if ($displayNameValue >= $item['min'] && $displayNameValue <= $item['max']) {
+
+                            return $displayNameValue;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -288,7 +310,6 @@ function getIdata($connection, $itemIds, $today, $idataTable, $errorsMessage)
 
 function getStatuses($configIdataRanges, $itemValue, $description)
 {
-
     if (!is_numeric($itemValue)) {
         return $itemValue;
     }
@@ -370,13 +391,21 @@ $severity = isset($results['severityValue']) && isset($results['severityValue'][
 $name = isset($results['object_properties']) && isset($results['object_properties']['name']) ? $results['object_properties']['name'] : '';
 
 $statuses = [];
-foreach ($configIdataRanges as $rangeDescription => $values) {
-    foreach ($values as $key => $item) {
-        if (!in_array($key, $statuses)) {
-            $statuses[] = $key;
+$macNameValues = [];
+
+function configRanges($configRanges, $arrValues)
+{
+    foreach ($configRanges as $rangeNames => $values) {
+        foreach ($values as $key => $item) {
+            if (!in_array($key, $arrValues)) {
+                $arrValues[] = $key;
+            }
         }
     }
+    return $arrValues;
 }
+$statuses = configRanges($configIdataRanges, $statuses);
+$macNameValues = configRanges($configTdataRanges, $macNameValues);
 
 $excludeKeys = [
     'id',
@@ -444,23 +473,28 @@ $excludeKeys = [
             </tr>
         <?php endforeach; ?>
     <?php endif; ?>
-
     <?php if (isset($macAddressesValue) && !empty($macAddressesValue)) : ?>
         <?php foreach ($macAddressesValue as $line) : ?>
             <?php
             $tdValues = [];
             foreach ($line as $key => $str) {
+                $displayNameValue = '';
+                $name = '';
                 $strValue = '';
                 if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
-                    $strValue = $str;
+                    $displayNameValue = $str;
+                    $name = $key;
+                    $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
+                    if (isset($macValueStatuses) && !empty($macValueStatuses)) {
+                        $strValue =  $macValueStatuses . '<br>';
+
+                    }
                     $tdValues[] = $strValue;
                 }
             }
-
             ?>
             <tr style="vertical-align: top;">
-                <td class='even_th'><?= $line['id'] ?></td>
-                <td><?= $line['Table_Name'] ?></td>
+                <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
                 <td>
                     <?php foreach ($tdValues as $td) : ?>
                         <?= $td ?>
