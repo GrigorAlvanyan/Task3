@@ -32,7 +32,6 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
     $macAddressTables = [];
 
     $tdata = 'tdata_' . $objectProp['object_id'];
-    $tdata = 'tdata_78528';
     $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
     if ($tableIdValues = $connection->query($sql)) {
         $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
