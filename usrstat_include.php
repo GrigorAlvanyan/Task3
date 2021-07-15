@@ -6,9 +6,9 @@ $configs = include 'config.php';
 
 $severityStatuses = $configs['severityStatuses'];
 $errorsMessage = $configs['error_messages'];
-$configIdataRanges = $configs['idata_ranges'];
+$configIdataRanges = isset($configs['idata_ranges']) ? $configs['idata_ranges'] : [];
 $filteredNames = $configs['filteredNames'];
-$configTdataRanges = $configs['tdata_ranges'];
+$configTdataRanges = isset($configs['tdata_ranges']) ? $configs['tdata_ranges'] : [];
 
 
 $nodeName = '';
@@ -27,31 +27,19 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
     $nodeName = $personalinfo[2];
 }
 
-//$eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
-if (isset($_GET['mac']) && !empty($_GET['mac'])) {
-    $macName = $_GET['mac'];
-    if(strlen(implode('', explode(':', trim($macName)))) == 12){
-        $eoc_mac = implode('', explode(':', trim($macName)));
-        $macAddressesValue = getMaccAddress($connection,$eoc_mac);
-        }
-}else {
-    if (isset($personalinfo[43])) {
-        if (strpos($personalinfo[43], "375828706861857")) {
-            $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
-            $eoc_mac = $eoc_tmp_array[2];
-            $macAddressesValue = getMaccAddress($connection, $eoc_mac);
-        }
-    }
-}
-function getMaccAddress($connection, $eoc_mac)
+
+function getMaccAddress($connection, $eoc_mac, $objectProp)
 {
     $macAddressTables = [];
-    $sql = "SELECT DISTINCT item_id FROM tdata_78528 ";
+
+    $tdata = 'tdata_' . $objectProp['object_id'];
+    $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
     if ($tableIdValues = $connection->query($sql)) {
         $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
         foreach ($tableIdValues as $resultItem) {
+
             $sqlFin = "SELECT `item_id`, `tdata_timestamp`, `tdata_value`          
-                    FROM tdata_78528 
+                    FROM {$tdata} 
                     WHERE item_id = {$resultItem['item_id']} 
                     ORDER BY `tdata_timestamp` DESC  LIMIT 1";
 
@@ -62,6 +50,7 @@ function getMaccAddress($connection, $eoc_mac)
 
                     $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
                     if (empty($htmlTable)) {
+
                         $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
                         if (empty($htmlTable)) {
                             echo 'error offset ';
@@ -86,12 +75,11 @@ function getMaccAddress($connection, $eoc_mac)
                         }
                         $col = $columnArr;
                     }
-
                     $rows = $table->item(0)->getElementsByTagName('tr');
                     foreach ($rows as $row) {
-
                         $cols = $row->getElementsByTagName('td');
                         if ($cols->item(1)->nodeValue == $eoc_mac) {
+
                             $macAddressTable = [];
                             $mac = '';
                             $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
@@ -112,11 +100,14 @@ function getMaccAddress($connection, $eoc_mac)
                         }
                     }
                 }
+            } else {
+                echo 'Result macAddress not found, line:' . __LINE__;
+                die;
             }
         }
         return $macAddressTables;
     } else {
-        return 'Result macAddress not found, line:' . __LINE__;
+        echo 'Result macAddress not found, line:' . __LINE__;
         die;
     }
 }
@@ -171,6 +162,9 @@ function getObjectProperties($connection, $nodeName, $errorsMessage)
     }
     return $objectProperties;
 }
+
+
+
 
 
 function getSeverityValues($resultStatus, $severityStatuses)
@@ -387,6 +381,31 @@ if (isset($results['error'])) {
 //    dd($results);
 }
 
+
+$objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
+if (!empty($objectProp)) {
+    //$eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
+    if (isset($_GET['mac']) && !empty($_GET['mac'])) {
+        $macName = $_GET['mac'];
+        if(strlen(implode('', explode(':', trim($macName)))) == 12){
+            $eoc_mac = implode('', explode(':', trim($macName)));
+            $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp);
+        }
+    }else {
+        if (isset($personalinfo[43])) {
+            if (strpos($personalinfo[43], "375828706861857")) {
+                $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
+                $eoc_mac = $eoc_tmp_array[2];
+                $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp);
+
+            }
+        }
+    }
+} else {
+    echo 'not found';
+    die;
+}
+
 $connection->close();
 
 $status = isset($results['severityValue']) && isset($results['severityValue']['max']) ? $results['severityValue']['max'] : '';
@@ -415,6 +434,8 @@ $excludeKeys = [
     'Table_Name',
     'MAC',
 ];
+
+
 
 ?>
 
@@ -488,25 +509,30 @@ $excludeKeys = [
                     $displayNameValue = (int) $str;
                     $name = $key;
                     $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
-
                     if (isset($macValueStatuses) && !empty($macValueStatuses)) {
                         $strValue = $macValueStatuses . '<br>';
+                    } else {
+                        $strValue = $name .':'. $displayNameValue . '<br>';
                     }
                     $tdValues[] = $strValue;
                 }
+
             }
             ?>
             <tr style="vertical-align: top;">
                 <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
-                <td>
+                <td class='even_th'>
                     <?php foreach ($tdValues as $td) : ?>
                         <?= $td ?>
                     <?php endforeach; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
+    <?php elseif(isset($macAddressesValue) && empty($macAddressesValue)) :?>
+    <tr>
+        <td nowrap="nowrap"><?= 'MAC Address not found';?></td>
+    </tr>
     <?php endif; ?>
-
 </table>
 </body>
 </html>
