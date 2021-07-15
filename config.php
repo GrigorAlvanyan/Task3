@@ -10,16 +10,16 @@ return [
     ],
     'error_messages' => [
         'not_name' => 'Result with name: :name not found, line:',
-        'node_name' => ' not found, line:',
+        'node_name' => 'not found, line:',
         'status' => 'Result status not found, line:',
         'items' => 'Result items not found, line:',
         'table' => ' table not found, line:',
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',
+        'host' => '10.1.1.41',//10.1.1.41
         'user' => 'root',
-        'password' => '1234', 
+        'password' => '1234',//1234
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],
@@ -202,46 +202,174 @@ return [
     'tdata_ranges' => [
         "Wec TX Signal" => [
             'TX' => [
-                [
-                    'min' => 254,
-                    'max' => 256
+                'normal' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                    ],
+                'minor' => [
+                      [
+                          'min' => 7,
+                          'max' => 12
+                      ],
+                      [
+                          'min' => 15,
+                          'max' => 200
+                      ]
+                 ],
+                'major' => [
+                    [
+                        'min' => 201,
+                        'max' => 222
+                    ],
+                    [
+                        'min' => 201,
+                        'max' => 211
+                    ]
                 ],
-                [
-                    'min' => 1,
-                    'max' => 256
-                ],
+                'critical' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 201,
+                        'max' => 256
+                    ]
+                ]
             ],
             'RX' => [
-                [
-                    'min' => 1,
-                    'max' => 256
+                'normal' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
                 ],
-                [
-                    'min' => 10,
-                    'max' => 256
+                'minor' => [
+                    [
+                        'min' => 7,
+                        'max' => 12
+                    ],
+                    [
+                        'min' => 15,
+                        'max' => 200
+                    ]
                 ],
+                'minor' => [
+                    [
+                        'min' => 201,
+                        'max' => 256
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ],
+                'critical' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ]
             ]
         ],
         "Wec RX Signal" => [
             'TX' => [
-                [
-                    'min' => 10,
-                    'max' => 256
+                'normal' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
                 ],
-                [
-                    'min' => 254,
-                    'max' => 256
+                'minor' => [
+                    [
+                        'min' => 255,
+                        'max' => 255
+                    ],
+                    [
+                        'min' => 15,
+                        'max' => 200
+                    ]
                 ],
+                'major' => [
+                    [
+                        'min' => 201,
+                        'max' => 246
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ],
+                'critical' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ]
             ],
             'RX' => [
-                [
-                    'min' => 23,
-                    'max' => 256
+                'normal' => [
+                    [
+                        'min' => 255,
+                        'max' => 255
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
                 ],
-                [
-                    'min' => 1,
-                    'max' => 33
+                'minor' => [
+                    [
+                        'min' => 7,
+                        'max' => 12
+                    ],
+                    [
+                        'min' => 15,
+                        'max' => 200
+                    ]
                 ],
+                'major' => [
+                    [
+                        'min' => 222,
+                        'max' => 223
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ],
+                'critical' => [
+                    [
+                        'min' => 4,
+                        'max' => 6
+                    ],
+                    [
+                        'min' => 8883,
+                        'max' => 10000000
+                    ]
+                ]
             ]
         ]
     ]

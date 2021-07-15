@@ -1,5 +1,4 @@
 <?php
-//phpinfo();
 error_reporting(E_ALL);
 require_once 'helpers.php';
 $configs = include 'config.php';
@@ -7,7 +6,7 @@ $configs = include 'config.php';
 $severityStatuses = $configs['severityStatuses'];
 $errorsMessage = $configs['error_messages'];
 $configIdataRanges = isset($configs['idata_ranges']) ? $configs['idata_ranges'] : [];
-$filteredNames = $configs['filteredNames'];
+$filteredNames = isset($configs['filteredNames']) ? $configs['filteredNames'] : [];
 $configTdataRanges = isset($configs['tdata_ranges']) ? $configs['tdata_ranges'] : [];
 
 
@@ -33,6 +32,7 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
     $macAddressTables = [];
 
     $tdata = 'tdata_' . $objectProp['object_id'];
+    $tdata = 'tdata_78528';
     $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
     if ($tableIdValues = $connection->query($sql)) {
         $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
@@ -53,8 +53,7 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
 
                         $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
                         if (empty($htmlTable)) {
-                            echo 'error offset ';
-                            die;
+                            return 'error offset';
                         }
                     }
 
@@ -101,14 +100,12 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
                     }
                 }
             } else {
-                echo 'Result macAddress not found, line:' . __LINE__;
-                die;
+                return 'Result Table not found';
             }
         }
         return $macAddressTables;
     } else {
-        echo 'Result macAddress not found, line:' . __LINE__;
-        die;
+        return 'Result Table not found';
     }
 }
 
@@ -118,17 +115,16 @@ function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName
     if (!is_numeric($displayNameValue)) {
         return $displayNameValue;
     }
-
     foreach ($configTdataRanges as $rangeTabName => $values) {
-
         if ($tableName == $rangeTabName) {
             foreach ($values as $key => $value) {
-
                 if ($displayName == $key) {
-                    foreach ($value as $item) {
-                        if ($displayNameValue >= $item['min'] && $displayNameValue <= $item['max']) {
-                            $dispName = $key . ':' . $displayNameValue;
-                            return $dispName;
+                    foreach ($value as $statuses => $status) {
+                        foreach ($status as $value) {
+                            if ($displayNameValue >= $value['min'] && $displayNameValue <= $value['max']) {
+                                $dispName = $key . ':' . $statuses;
+                                return $dispName;
+                            }
                         }
                     }
                 }
@@ -390,6 +386,10 @@ if (!empty($objectProp)) {
         if(strlen(implode('', explode(':', trim($macName)))) == 12){
             $eoc_mac = implode('', explode(':', trim($macName)));
             $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp);
+            $errorOffset = '';
+            if($macAddressesValue == 'error offset'){
+                $errorOffset = $macAddressesValue;
+            }
         }
     }else {
         if (isset($personalinfo[43])) {
@@ -397,7 +397,10 @@ if (!empty($objectProp)) {
                 $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
                 $eoc_mac = $eoc_tmp_array[2];
                 $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp);
-
+                $errorOffset = '';
+                if($macAddressesValue == 'error offset'){
+                    $errorOffset = $macAddressesValue;
+                }
             }
         }
     }
@@ -413,9 +416,8 @@ $severity = isset($results['severityValue']) && isset($results['severityValue'][
 $name = isset($results['object_properties']) && isset($results['object_properties']['name']) ? $results['object_properties']['name'] : '';
 
 $statuses = [];
-$macNameValues = [];
 
-function configRanges($configRanges, $arrValues)
+function configIdataRanges($configRanges, $arrValues)
 {
     foreach ($configRanges as $rangeNames => $values) {
         foreach ($values as $key => $item) {
@@ -426,8 +428,8 @@ function configRanges($configRanges, $arrValues)
     }
     return $arrValues;
 }
-$statuses = configRanges($configIdataRanges, $statuses);
-$macNameValues = configRanges($configTdataRanges, $macNameValues);
+
+$statuses = configIdataRanges($configIdataRanges, $statuses);
 
 $excludeKeys = [
     'id',
@@ -497,6 +499,15 @@ $excludeKeys = [
             </tr>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <?php if($macAddressesValue == 'Result Table not found') : ?>
+        <tr>
+            <td nowrap="nowrap"><?= 'Result Table not found';?></td>
+        </tr>
+    <?php die; ?>
+    <?php endif; ?>
+
+    <?php if($errorOffset != 'error offset') :?>
     <?php if (isset($macAddressesValue) && !empty($macAddressesValue)) : ?>
         <?php foreach ($macAddressesValue as $line) : ?>
             <?php
@@ -532,6 +543,11 @@ $excludeKeys = [
     <tr>
         <td nowrap="nowrap"><?= 'MAC Address not found';?></td>
     </tr>
+    <?php endif; ?>
+    <?php else :?>
+        <tr>
+            <td nowrap="nowrap"><?= 'Error offset';?></td>
+        </tr>
     <?php endif; ?>
 </table>
 </body>
