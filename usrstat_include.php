@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 require_once 'helpers.php';
 $configs = include 'config.php';
 
+
 $severityStatuses = $configs['severityStatuses'];
 $errorsMessage = $configs['error_messages'];
 $configIdataRanges = isset($configs['idata_ranges']) ? $configs['idata_ranges'] : [];
@@ -32,6 +33,7 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
     $macAddressTables = [];
     $numb = 0;
     $tdata = 'tdata_' . $objectProp['object_id'];
+    $tdata = 'tdata_78528';
 
     $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
     if ($tableIdValues = $connection->query($sql)) {
@@ -458,6 +460,8 @@ $excludeKeys = [
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="telnet/css/styles.css">
     <title>Узел</title>
 </head>
 <body>
@@ -593,6 +597,30 @@ $excludeKeys = [
         </tr>
     <?php endif; ?>
 </table>
+
+
+<script>
+    $(document).ready(function(){
+        $("#get_tables").click(function(){
+            $.ajax({
+                url: 'telnet/index.php',
+                success: function(result) {
+                    $("#telnet_html").html(result);
+                }
+            });
+        });
+    });
+</script>
+
+<button id="get_tables">Telnet info</button>
+
+<hr>
+
+<div id="telnet_html"></div>
+
+
 </body>
 </html>
+
+
 
