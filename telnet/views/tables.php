@@ -1,4 +1,8 @@
-
+<div style="margin-top: 20px;">
+    <a href="javascript:void(0)" id="restartRouter">
+        <img src="images/restart.png" alt="" style="width: 35px; height: 35px;">
+    </a>
+</div>
 <?php if(!empty($dhcpResultArr)) : ?>
 <div class="telnet_tables">
 <!--<div class="table_1">-->
@@ -20,16 +24,9 @@
     </table>
 <?php endif; ?>
 
-
-    <div>
-        <a href="javascript:void(0)" id="restartRouter">
-            <img src="images/restart.png" alt="" style="width: 16px; height: 16px;">
-        </a>
-    </div>
-
-
 <?php if(!empty($wireless)) : ?>
     <div class="wireless">
+    <!--<div class="table_1">-->
         <h2>Wireless</h2>
         <table>
             <tr>
@@ -55,6 +52,7 @@
 
 <?php if(!empty($nameOfMacAddress)) : ?>
     <div class="associated_stations">
+
         <table>
             <h2>Associated Stations</h2>
             <tr>
@@ -68,7 +66,7 @@
 
                 <tr >
                     <td style="border-right: 1px solid transparent;">
-                        <img width=30 src='img/associated_icon.png'>
+                        <img width=30 src='images/associated_icon.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>' >
                     </td>
                     <td>
                         <?php echo $res['hostName']; ?>
@@ -89,19 +87,21 @@
 
 <script>
     $(document).ready(function(){
-
         $('#restartRouter').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
                     url: 'telnet/index.php',
-                    data: {"eoc_ip": "<?=$eocIp?>"},
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
+                    beforeSend: function () {
+                        // $('#restartRouter img')
+                    },
                     success: function(result) {
-                        $("#telnet_html").html(result);
+                        console.log(result)
+                        // $("#telnet_html").html(result);
                     }
                 });
             }
         })
-
     });
 
 

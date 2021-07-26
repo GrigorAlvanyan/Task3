@@ -1,17 +1,7 @@
 <?php
 
-function dd($res)
-{
-    echo '<pre>';
-    print_r($res);
-    echo '</pre>';
-};
-
 require_once 'app/functions.php';
-require_once(__DIR__ . '/telnet/TelnetClient.php');
 $configs = include '../config.php';
-
-use TelnetClient\TelnetClient;
 
 if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
     if($configs['db_params']['host'] == 'localhost') {
@@ -20,13 +10,19 @@ if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
         $eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
     }
 } else {
-    // return error
+    die("Invalid IP address");
 }
 
-$telnet = new TelnetClient($eoc_ip, $configs['telnet_params']['port']);
-$telnet->connect();
-$telnet->setPrompt('$'); //setRegexPrompt() to use a regex
-$telnet->login($configs['telnet_params']['username'], $configs['telnet_params']['password']);
+$telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+
+if (isset($_GET['restart']) && $_GET['restart']) {
+    $command = 'reboot';
+//    $rebootResult = $telnet->exec($command);
+    dd($command);die;
+//    $cmdResults = linesRemove($rebootResult);
+//    $associatedLines = getAssociatedStations($cmdResults);
+//    $associatedLines = isset($associatedLines) && !empty($associatedLines) ? $associatedLines : [];
+}
 
 
 $command = 'iwinfo wlan0 assoclist';
@@ -57,60 +53,42 @@ $uptimeResult = linesRemove($uptimeResult);
 $uptimeResultLine = getUptime($uptimeResult);
 
 
-
 $command = 'date';
 $dateResult = $telnet->exec($command);
 $dateResults = linesRemove($dateResult);
-//dd($dateResults);die;
-//$dateResultLine = getDate2($dateResults);
-//dd
-//dd($dateResultLine);die;
 
-
-//function getDate2($dateLine)
-//{
-//    $dateValues = explode(' ', $dateLine[1]);
-//    dd(count($dateValues));
-////    die;
-////    unset(count($dateValues) - 2);
-//    $dateValues = impode('',$dateValues);
-//    echo count($dateValues);
-//    dd($dateValues);
-//}
-
+//todo needs refactoring
 function getUptime($uptimeResult)
 {
-//dd($uptimeResult);die;
-    $upditeValues = [];
-    $uptimeResultvalues = explode(', ',$uptimeResult[1]);
-    $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
-    unset($dayValue[0]);
-    unset($dayValue[1]);
-    $dayValue[3] = 'd';
-    $dayValue = implode('',$dayValue);
-    $upditeValues['day'] = $dayValue;
-    if(strpos($uptimeResultvalues[1], ':')){
-        $hourMinut = explode(':', $uptimeResultvalues[1]);
-        $hourMinut[0] = $hourMinut[0] . 'h';
-        $hourMinut[1] = $hourMinut[1] . 'm';
-        $dateValue = implode(' ', $hourMinut);
-    } else {
-        $hourMinut = explode(' ', $uptimeResultvalues[1]);
-        $hourMinut[0] = '0h'.' '.$hourMinut[0];
-        $hourMinut[1] = 'm';
-        $dateValue = implode('', $hourMinut);
-
-    }
-    $dayValue =  $dayValue .' '.$dateValue ;
+//    $upditeValues = [];
+//    $uptimeResultvalues = explode(', ',$uptimeResult[1]);
+//    $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
+//
+//    unset($dayValue[0]);
+//    unset($dayValue[1]);
 //    dd($dayValue);die;
-
-    return $dayValue;
+//    $dayValue[3] = 'd';
+//    $dayValue = implode('',$dayValue);
+//    $upditeValues['day'] = $dayValue;
+//    if(strpos($uptimeResultvalues[1], ':')){
+//        $hourMinut = explode(':', $uptimeResultvalues[1]);
+//        $hourMinut[0] = $hourMinut[0] . 'h';
+//        $hourMinut[1] = $hourMinut[1] . 'm';
+//        $dateValue = implode(' ', $hourMinut);
+//    } else {
+//        $hourMinut = explode(' ', $uptimeResultvalues[1]);
+//        $hourMinut[0] = '0h'.' '.$hourMinut[0];
+//        $hourMinut[1] = 'm';
+//        $dateValue = implode('', $hourMinut);
+//
+//    }
+//    $dayValue =  $dayValue .' '.$dateValue ;
+//
+//    return $dayValue;
 }
 
 
 
-
-//dd($uptimeResultLine);die;
 
 
 $telnet->disconnect();

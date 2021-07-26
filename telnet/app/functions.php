@@ -1,5 +1,20 @@
 <?php
 
+require_once(__DIR__ . '/../telnet/TelnetClient.php');
+
+use TelnetClient\TelnetClient;
+
+function telnetConnection($ip, $port, $username, $password, $prompt = '$')
+{
+    $telnet = new TelnetClient($ip, $port);
+    $telnet->connect();
+    $telnet->setPrompt($prompt);
+    $telnet->login($username, $password);
+
+    return $telnet;
+}
+
+
 function isValidMacAddress($mac)
 {
     if (preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac)) {
@@ -12,13 +27,18 @@ function getAssociatedStations($associatedStationLines) {
 
     $associatedStations = [];
     $mac = '';
+//    dd($associatedStationLines);
     foreach ($associatedStationLines as $key => $line) {
 
         $macAddress = explode('  ', $line);
+//        dd($macAddress);
         if (isset($macAddress[0]) && isValidMacAddress($macAddress[0])) {
             $mac = $macAddress[0];
             $associatedStations[$mac]['mac'] = $mac;
-
+            if (isset($macAddress[1]) && !empty($macAddress[1])){
+                $signal = explode(' (', $macAddress[1]);
+                $associatedStations[$mac]['signal'] = $signal[0];
+            }
         } elseif (strpos($line, 'RX:')) {
             $rxLine = trim($line);
             $rxLine = substr($rxLine, 0, strpos($rxLine, '  '));

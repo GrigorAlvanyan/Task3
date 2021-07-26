@@ -35,6 +35,7 @@ function objectProperties($connection, $nodeName, $returnData)
 
         if (!isset($objectProperties)) {
             $returnData['object_properties']['name'] = "(Name: $nodeName not found)";
+//            dd($returnData);die;
             return ['returnData' => $returnData];
         }
 
@@ -101,3 +102,28 @@ function idataByItemId($connection, $idataTable, $itemId)
 
     return $result;
 }
+
+function itemIdsArray($connection,$tdata)
+{
+    $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
+
+    $tableIdValues = $connection->query($sql);
+    $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
+
+    return $tableIdValues;
+
+}
+
+function tdataArrayValues($connection, $tdata, $resultItem)
+{
+    $sqlFin = "SELECT `item_id`, `tdata_timestamp`, `tdata_value`          
+                        FROM {$tdata} 
+                        WHERE item_id = {$resultItem['item_id']} 
+                        ORDER BY `tdata_timestamp` DESC  LIMIT 1";
+
+    $resultValues = $connection->query($sqlFin);
+    $resultValues = $resultValues->fetch_all(MYSQLI_ASSOC);
+
+    return $resultValues;
+}
+

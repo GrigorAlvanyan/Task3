@@ -375,9 +375,9 @@ return [
         ]
     ],
     'telnet_params'=>[
-        'port' => 23,
-        'username' => 'admin',
-        'password' => 'Q12KL79G'
+        'port' => 111,
+        'username' => '****',
+        'password' => '****'
     ]
 ];
 

@@ -28,8 +28,6 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
 if (isset($results['error'])) {
     echo $results['error'];
-} else {
-//    dd($results);
 }
 
 $macAddressesValue = [];

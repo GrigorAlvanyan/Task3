@@ -2,7 +2,7 @@
 
 require_once 'src/db/functions.php';
 
-//refactored
+
 function dbConnection($dbConfigs, $personalinfo)
 {
     $connection = connection($dbConfigs, $personalinfo);
@@ -14,88 +14,81 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
 {
     $macAddressTables = [];
     $numb = 0;
-    $tdata = 'tdata_' . $objectProp['object_id'];
-    $isLocal = isLocal();
-    if (isset($isLocal) && $isLocal) {
+    if (isset($objectProp['object_id'])) {
+        $tdata = 'tdata_' .  $objectProp['object_id'];
+        $isLocal = isLocal();
+
+        if (isset($isLocal) && $isLocal) {
         $tdata = 'tdata_78528';
-    }
+        }
 
-    $sql = "SELECT DISTINCT item_id FROM {$tdata} ";
-    if ($tableIdValues = $connection->query($sql)) {
-        $tableIdValues = $tableIdValues->fetch_all(MYSQLI_ASSOC);
-        foreach ($tableIdValues as $resultItem) {
-            $sqlFin = "SELECT `item_id`, `tdata_timestamp`, `tdata_value`          
-                    FROM {$tdata} 
-                    WHERE item_id = {$resultItem['item_id']} 
-                    ORDER BY `tdata_timestamp` DESC  LIMIT 1";
+        $tableIdValues = itemIdsArray($connection, $tdata);
 
-            if ($resultValues = $connection->query($sqlFin)) {
-                $resultValues = $resultValues->fetch_all(MYSQLI_ASSOC);
-//                $resultValues = [];
-                foreach ($resultValues as $value) {
+            foreach ($tableIdValues as $resultItem) {
 
-                    $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
-                    if (empty($htmlTable)) {
+                $resultValues = tdataArrayValues($connection, $tdata, $resultItem);
 
-                        $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
+                 foreach ($resultValues as $value) {
+                        $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
                         if (empty($htmlTable)) {
-                            return 'error offset';
-                        }
-                    }
-
-                    $doc = new DOMDocument();
-                    libxml_use_internal_errors(true);
-                    @$doc->loadHTML($htmlTable);
-                    libxml_clear_errors();
-                    $doc->preserveWhiteSpace = false;
-                    $table = $doc->getElementsByTagName('table');
-                    $tableName = $table->item(0)->getAttribute("name");
-                    $column = $doc->getElementsByTagName('column');
-                    $columnCount = $column->length;
-
-                    if ($columnCount > 2) {
-                        $columnArr = [];
-                        for ($i = 2; $i < $columnCount; $i++) {
-                            $columnArr[] = $column->item($i)->getAttribute("name");
-                        }
-                        $col = $columnArr;
-                    }
-                    $rows = $table->item(0)->getElementsByTagName('tr');
-                    foreach ($rows as $row) {
-                        $cols = $row->getElementsByTagName('td');
-                        if ($cols->item(1)->nodeValue == $eoc_mac) {
-                            $numb++;
-                            $macAddressTable = [];
-                            $mac = '';
-                            $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
-
-                            $item = 0;
-                            $tablesName = [
-                                'id' => $resultItem['item_id'],
-                                'Table_Name' => $tableName,
-                                'MAC' => $mac,
-                            ];
-                            for ($i = 2; $i < $columnCount; $i++) {
-
-                                $val = $cols->item($i)->nodeValue . ' ';
-                                $tablesName["{$col[$item]}"] = $val;
+                            $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
+                            if (empty($htmlTable)) {
+                                return 'error offset';
                             }
-                            $macAddressTable = $tablesName;
-                            $macAddressTables[] = $macAddressTable;
+                        }
+
+                        $doc = new DOMDocument();
+                        libxml_use_internal_errors(true);
+                        @$doc->loadHTML($htmlTable);
+                        libxml_clear_errors();
+                        $doc->preserveWhiteSpace = false;
+                        $table = $doc->getElementsByTagName('table');
+                        $tableName = $table->item(0)->getAttribute("name");
+                        $column = $doc->getElementsByTagName('column');
+                        $columnCount = $column->length;
+
+                        if ($columnCount > 2) {
+                            $columnArr = [];
+                            for ($i = 2; $i < $columnCount; $i++) {
+                                $columnArr[] = $column->item($i)->getAttribute("name");
+                            }
+                            $col = $columnArr;
+                        }
+                        $rows = $table->item(0)->getElementsByTagName('tr');
+                        foreach ($rows as $row) {
+                            $cols = $row->getElementsByTagName('td');
+                            if ($cols->item(1)->nodeValue == $eoc_mac) {
+                                $numb++;
+                                $macAddressTable = [];
+                                $mac = '';
+                                $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
+
+                                $item = 0;
+                                $tablesName = [
+                                    'id' => $resultItem['item_id'],
+                                    'Table_Name' => $tableName,
+                                    'MAC' => $mac,
+                                ];
+                                for ($i = 2; $i < $columnCount; $i++) {
+
+                                    $val = $cols->item($i)->nodeValue . ' ';
+                                    $tablesName["{$col[$item]}"] = $val;
+                                }
+                                $macAddressTable = $tablesName;
+                                $macAddressTables[] = $macAddressTable;
+                            }
                         }
                     }
-                }
-            } else {
-                return 'Result Table not found';
             }
-        }
-        if($numb == 0) {
-            return  $macAddressTables[] = 'MAC Address not found';
-        }
-        return $macAddressTables;
+            if ($numb == 0) {
+                return $macAddressTables[] = 'MAC Address not found';
+            }
+            return $macAddressTables;
     } else {
         return 'Result Table not found';
+//        return ;
     }
+
 }
 
 function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName, $tableName)
@@ -126,7 +119,7 @@ function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName
         }
     }
 }
-//refactored
+
 function getObjectProperties($connection, $nodeName, $errorsMessage)
 {
     $returnData = [
@@ -140,7 +133,7 @@ function getObjectProperties($connection, $nodeName, $errorsMessage)
 
     return $objectProperties;
 }
-//refactored
+
 function getSeverityValues($resultStatus, $severityStatuses)
 {
     $severityName = '';
@@ -166,7 +159,7 @@ function getSeverityValues($resultStatus, $severityStatuses)
     ];
 
 }
-//refactored
+
 function getSeverity($connection, $objectProperties, $severityStatuses, $today, $errorsMessage)
 {
     $resultStatus = severity($connection, $objectProperties['object_id']);
@@ -187,7 +180,7 @@ function getSeverity($connection, $objectProperties, $severityStatuses, $today, 
 
     return ['severityValue' => $severityValue, 'resultStatus' => $resultStatus];
 }
-//refactored
+
 function getIdataIds($connection, $objectProperties, $filteredNames, $errorsMessage)
 {
     $objectId = $objectProperties['object_id'];
@@ -203,7 +196,7 @@ function getIdataIds($connection, $objectProperties, $filteredNames, $errorsMess
 
     return ['idatatTable' => $idataTable, 'itemIds' => $itemIds];
 }
-//refactored
+
 function getIdata($connection, $itemIds, $today, $idataTable, $errorsMessage)
 {
     $resultValuesData = [];
@@ -223,7 +216,7 @@ function getIdata($connection, $itemIds, $today, $idataTable, $errorsMessage)
 
     return $resultValuesData;
 }
-//refactored
+
 function getStatuses($configIdataRanges, $itemValue, $description)
 {
     if (!is_numeric($itemValue)) {
