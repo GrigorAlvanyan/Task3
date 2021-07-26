@@ -1,6 +1,7 @@
 
 <?php if(!empty($dhcpResultArr)) : ?>
 <div class="telnet_tables">
+<!--<div class="table_1">-->
     <table>
         <h2> DHCP Leases </h2>
         <tr>
@@ -19,6 +20,12 @@
     </table>
 <?php endif; ?>
 
+
+    <div>
+        <a href="javascript:void(0)" id="restartRouter">
+            <img src="images/restart.png" alt="" style="width: 16px; height: 16px;">
+        </a>
+    </div>
 
 
 <?php if(!empty($wireless)) : ?>
@@ -77,4 +84,28 @@
     </div>
 </div>
 <?php endif; ?>
+
+
+
+<script>
+    $(document).ready(function(){
+
+        $('#restartRouter').click(function() {
+            if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
+                $.ajax({
+                    url: 'telnet/index.php',
+                    data: {"eoc_ip": "<?=$eocIp?>"},
+                    success: function(result) {
+                        $("#telnet_html").html(result);
+                    }
+                });
+            }
+        })
+
+    });
+
+
+
+
+</script>
 

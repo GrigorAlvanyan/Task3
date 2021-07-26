@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'is_local' => true,
     'severityStatuses' => [
         '0' => 'normal',
         '1' => 'warning',
@@ -17,9 +18,9 @@ return [
         'values' => 'Result values not found, line:'
     ],
     'db_params' => [
-        'host' => '10.1.1.41',//10.1.1.41
+        'host' => 'localhost',//10.1.1.41
         'user' => 'root',
-        'password' => '1234',//1234
+        'password' => '',//1234
         'db_name' => 'netxms'
     ],
     'filteredNames' => [],
@@ -143,8 +144,8 @@ return [
         "Att-2" => [
             'normal' => [
                 [
-                    'min' => 4,
-                    'max' => 6
+                    'min' => 1,
+                    'max' => 2
                 ],
                 [
                     'min' => 17,
@@ -372,6 +373,11 @@ return [
                 ]
             ]
         ]
+    ],
+    'telnet_params'=>[
+        'port' => 23,
+        'username' => 'admin',
+        'password' => 'Q12KL79G'
     ]
 ];
 
