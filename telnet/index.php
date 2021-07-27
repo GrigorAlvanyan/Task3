@@ -1,14 +1,13 @@
 <?php
 
-require_once 'app/functions.php';
-$configs = include '../config.php';
+define('ROOT_DIR', __DIR__);
+
+require_once ROOT_DIR . '/telnet/TelnetClient.php';
+require_once ROOT_DIR . '/app/functions.php';
+$configs = include ROOT_DIR . '/../config.php';
 
 if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
-    if($configs['db_params']['host'] == 'localhost') {
-        $eoc_ip = $_GET['eoc_ip'];
-    } else {
-        $eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
-    }
+    $eoc_ip = $_GET['eoc_ip'];
 } else {
     die("Invalid IP address");
 }
@@ -17,11 +16,7 @@ $telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs[
 
 if (isset($_GET['restart']) && $_GET['restart']) {
     $command = 'reboot';
-//    $rebootResult = $telnet->exec($command);
-//    dd($command);die;
-//    $cmdResults = linesRemove($rebootResult);
-//    $associatedLines = getAssociatedStations($cmdResults);
-//    $associatedLines = isset($associatedLines) && !empty($associatedLines) ? $associatedLines : [];
+    $rebootResult = $telnet->exec($command);
 }
 
 
@@ -94,4 +89,4 @@ function getUptime($uptimeResult)
 $telnet->disconnect();
 ?>
 
-<?php include 'views/tables.php'?>
+<?php include ROOT_DIR . '/views/tables.php'?>

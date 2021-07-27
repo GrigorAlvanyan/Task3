@@ -1,16 +1,18 @@
 
 <div style="margin-top: 20px;">
     <a href="javascript:void(0)" id="restartRouter">
-        <img src="images/restart.png" alt="" style="width: 35px; height: 35px;">
+        <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
     </a>
 </div>
 
 
 
 <?php if(!empty($dhcpResultArr)) : ?>
-<div class="table_1">
-    <table>
-        <h2>DHCP Leases</h2>
+
+    <table class="table_1">
+        <tr>
+            <th><b>DHCP Leases</b></th>
+        </tr>
         <tr>
             <th><b>Hostname</b></th>
             <th><b>IPv4-Address</b></th>
@@ -28,12 +30,11 @@
 <?php endif; ?>
 
 <?php if(!empty($wireless)) : ?>
-    <div class="table_1">
-        <h2>Wireless</h2>
-        <table>
+        <table class="table_1">
             <tr>
-<!--                <td style="border-right: 1px solid transparent;">-->
-<!--                <td style="text-align:center; width:32px; padding:3px"><img width=16 src='images/associated_icon.png'></td>-->
+                <th><b>Wireless</b></th>
+            </tr>
+            <tr>
                 <td class='even_th'><strong>SSID:</strong> <?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?></td>
             </tr>
             <tr>
@@ -49,16 +50,19 @@
                 <td class='even_th'><strong>Encryption:</strong> <?php echo isset($wireless['Encryption']) ? $wireless['Encryption'] : ''?></td>
             </tr>
         </table>
-    </div>
+
 <?php endif; ?>
 
 
 <?php if(!empty($nameOfMacAddress)) : ?>
-    <div class="table_1">
-        <table>
-            <h2>Associated Stations</h2>
+
+        <table class="table_1">
+            <tr>
+                <th><b>Associated Stations</b></th>
+            </tr>
             <tr>
                 <th style="border-right: 15px solid transparent;"></th>
+                <th></th>
                 <th><b>Hostname</b></th>
                 <th><b>Brand</b></th>
                 <th><b>MAC-Address</b></th>
@@ -70,7 +74,7 @@
                 <tr>
                     <td style="border-right: 1px solid transparent;">
                     <td style='padding:0;width:15px;text-align:left'>
-                        <img width=16 src='images/associated_icon.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>' >
+                        <img width=16 src='img/associated_icon.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>' >
                     </td>
                     <td class='even_th'><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
                     <td class='even_th'><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
@@ -80,8 +84,8 @@
                 </tr>
             <?php endforeach; ?>
         </table>
-    </div>
-</div>
+
+
 <?php endif; ?>
 
 
@@ -97,7 +101,7 @@
                         //
                     },
                     success: function(result) {
-                        // console.log(11);
+                        // console.log(result);
                     }
                 });
             }

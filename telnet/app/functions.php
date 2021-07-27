@@ -1,7 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/../telnet/TelnetClient.php');
-
 use TelnetClient\TelnetClient;
 
 function telnetConnection($ip, $port, $username, $password, $prompt = '$')

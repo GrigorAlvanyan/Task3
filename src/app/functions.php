@@ -1,8 +1,5 @@
 <?php
 
-require_once 'src/db/functions.php';
-
-
 function dbConnection($dbConfigs, $personalinfo)
 {
     $connection = connection($dbConfigs, $personalinfo);

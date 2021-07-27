@@ -1,9 +1,12 @@
 <?php
+
 error_reporting(E_ALL);
 
-require_once 'helpers.php';
-require_once 'src/app/functions.php';
+define('ROOT_DIR', __DIR__);
 
+require_once ROOT_DIR . '/helpers.php';
+require_once ROOT_DIR . '/src/db/functions.php';
+require_once ROOT_DIR . '/src/app/functions.php';
 
 $configs = getConfigs();
 
@@ -12,7 +15,16 @@ $errorsMessage = $configs['error_messages'];
 $configIdataRanges = isset($configs['idata_ranges']) ? $configs['idata_ranges'] : [];
 $filteredNames = isset($configs['filteredNames']) ? $configs['filteredNames'] : [];
 $configTdataRanges = isset($configs['tdata_ranges']) ? $configs['tdata_ranges'] : [];
-$eocIp = isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip']) ? $_GET['eoc_ip'] : '';
+
+if (isLocal()) {
+    $eoc_ip = isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip']) ? $_GET['eoc_ip'] : '';
+} else {
+    $eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
+}
+
+//dd($eoc_ip);die;
+
+
 
 $nodeName = '';
 $severityValue = [];
@@ -86,18 +98,7 @@ $excludeKeys = [
 
 ?>
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!--    <link rel="stylesheet" href="telnet/css/styles.css">-->
-    <title>Узел</title>
-</head>
-<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <table class='table_1'>
     <tr>
         <th colspan=2><b>Узел</b></th>
@@ -109,6 +110,7 @@ $excludeKeys = [
     <tr>
         <td class='even_th'>Статус:</td>
         <td><?= $severity ?></td>
+
         <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $severity ?>.png' alt='<?= $severity ?>' title='<?= $severity ?>'></td>
     </tr>
 
@@ -136,7 +138,10 @@ $excludeKeys = [
             <tr>
                 <td class='even_th'><?= $value['description'] ?></td>
                 <td><?= $value['idata_value'] ?></td>
-                <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $valueImg ?>.png' alt='<?= $valueImg ?>' title='<?= $valueImg ?>'>
+                <td style='padding:0;width:15px;text-align:center'>
+                    <?php if (!empty($valueImg)) : ?>
+                        <img width=16 src='img/err_<?= $valueImg ?>.png' alt='<?= $valueImg ?>' title='<?= $valueImg ?>'>
+                    <?php endif;?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -172,18 +177,19 @@ $excludeKeys = [
                                 $strValue = '';
                                 if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
 
-                                        $displayNameValue = (int)$str;
+                                    $displayNameValue = (int)$str;
                                     $name = $key;
                                     $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
 
                                         if (isset($macValueStatuses) && !empty($macValueStatuses)) {
+
+
                                         $strValue = $macValueStatuses['dispName'] . '<br>';
                                         $macStatus = $macValueStatuses['statuses'];
                                     } else {
                                         $strValue = $name . ':' . $displayNameValue . '<br>';
                                         $macStatus = '';
                                     }
-
                                         $tdValue = [
                                         'strValue' => $strValue,
                                         'macStatus' => $macStatus
@@ -192,17 +198,20 @@ $excludeKeys = [
 
                                     }
                             }
+
                         ?>
                         <tr style="vertical-align: top;">
                             <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
                             <td class='even_th'>
                                 <?php foreach ($tdValues as  $td) : ?>
-                                <?=  $td['strValue'] ?>
+                                <div><?=  $td['strValue'] ?></div>
                                 <?php endforeach; ?>
                             </td>
                             <td style='padding:0;width:15px;text-align:center'>
                                 <?php foreach ($tdValues as  $td) : ?>
-                                <img width=16 src='img/err_<?= $td['macStatus'] ?>.png' alt='<?= $td['macStatus'] ?>' title='<?= $td['macStatus'] . '<br>' ?>'>
+                                    <div>
+                                        <img width=16 src='img/err_<?= $td['macStatus'] ?>.png' alt='<?= $td['macStatus'] ?>' title='<?= $td['macStatus'] ?>'>
+                                    </div>
                                 <?php endforeach; ?>
                             </td>
 
@@ -241,7 +250,7 @@ $excludeKeys = [
         $("#get_tables").click(function(){
             $.ajax({
                 url: 'telnet/index.php',
-                data: {"eoc_ip": "<?=$eocIp?>"},
+                data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
                 },
@@ -258,14 +267,11 @@ $excludeKeys = [
 
 <button id="get_tables">
     <span style="display: block; float: left">Telnet info</span>
-    <img src="images/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
+    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
 </button>
 
 <div id="telnet_html"></div>
 
-
-</body>
-</html>
 
 
 
