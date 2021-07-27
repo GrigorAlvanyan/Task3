@@ -15,6 +15,7 @@ function telnetConnection($ip, $port, $username, $password, $prompt = '$')
 }
 
 
+
 function isValidMacAddress($mac)
 {
     if (preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac)) {
@@ -159,10 +160,25 @@ function getDhcpLeases($dhcpLeasesFileLines) {
     return $dhcpLeases;
 }
 
+$macaddressIo = file_get_contents('../files/macaddress_io-db.json');
+$macaddressIo = json_decode($macaddressIo);
+
+//echo '<pre>';
+//print_r($macaddressIo);
+echo $macaddressIo;
+die;
 
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
+//    echo __DIR__;die;
+
+//    echo '<pre>';
+//    print_r($associatedLines);
+//    die;
     foreach ($associatedLines as $key => $associatedValue) {
+        echo '<pre>';
+        print_r($key);
+//        dd($key);
         foreach ($dhcpResultArr as $models) {
             foreach ($models as $model){
                 if(strcasecmp($key, $model) == 0){
@@ -171,6 +187,9 @@ function nameOfMacAddress($associatedLines, $dhcpResultArr)
             }
         }
     }
+//    echo '<pre>';
+//    print_r($associatedLines);
+//    die;
     return $associatedLines;
 }
 

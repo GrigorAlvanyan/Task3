@@ -4,6 +4,19 @@ error_reporting(E_ALL);
 require_once 'helpers.php';
 require_once 'src/app/functions.php';
 
+
+$macaddressIo = file_get_contents('files/macaddress_io-db.json');
+//$macaddressIo = json_decode($macaddressIo, 1);
+//echo gettype($macaddressIo[0]);
+//$macaddressIo = explode("\r\n" ,$macaddressIo);
+//foreach ($macaddressIo as $line) {
+//    echo $line;
+//}
+dd($macaddressIo);
+die;
+
+
+
 $configs = getConfigs();
 
 $severityStatuses = $configs['severityStatuses'];

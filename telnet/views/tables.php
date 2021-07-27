@@ -58,6 +58,7 @@
             <tr>
                 <th style="border-right: 1px solid transparent;"></th>
                 <th><b>Hostname</b></th>
+                <th><b>Brand</b></th>
                 <th><b>MAC-Address</b></th>
                 <th><b>RX Rate</b></th>
                 <th><b>TX Rate</b></th>
@@ -68,12 +69,9 @@
                     <td style="border-right: 1px solid transparent;">
                         <img width=30 src='images/associated_icon.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>' >
                     </td>
-                    <td>
-                        <?php echo $res['hostName']; ?>
-                    </td>
-                    <td>
-                        <?php echo $res['mac']; ?>
-                    </td>
+                    <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
+                    <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
+                    <td><?php echo $res['mac'];?> </td>
                     <td><?php echo $res['rx']; ?></td>
                     <td><?php echo $res['tx']; ?></td>
                 </tr>
