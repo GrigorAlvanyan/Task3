@@ -5,18 +5,6 @@ require_once 'helpers.php';
 require_once 'src/app/functions.php';
 
 
-$macaddressIo = file_get_contents('files/macaddress_io-db.json');
-//$macaddressIo = json_decode($macaddressIo, 1);
-//echo gettype($macaddressIo[0]);
-//$macaddressIo = explode("\r\n" ,$macaddressIo);
-//foreach ($macaddressIo as $line) {
-//    echo $line;
-//}
-dd($macaddressIo);
-die;
-
-
-
 $configs = getConfigs();
 
 $severityStatuses = $configs['severityStatuses'];
@@ -37,7 +25,6 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
     $nodeName = $personalinfo[2];
 }
 
-
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
 if (isset($results['error'])) {
     echo $results['error'];
@@ -48,10 +35,7 @@ $errorOffset = '';
 $errorWrongMacAddress = '';
 $objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
 
-//dd($objectProp);die;
-
 if (!empty($objectProp)) {
-
 
     if (isset($_GET['mac']) && !empty($_GET['mac'])) {
         $macName = $_GET['mac'];
@@ -68,7 +52,7 @@ if (!empty($objectProp)) {
         if (isset($personalinfo[43])) {
             if (strpos($personalinfo[43], "375828706861857")) {
                 $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
-                if (str_replace(":","",$eoc_tmp_array[2]) == 12){
+                if (strlen(str_replace(":","",$eoc_tmp_array[2])) == 12){
                     $eoc_mac = str_replace(":","",$eoc_tmp_array[2]);
                     $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp);
                     if($macAddressesValue == 'error offset'){
@@ -110,7 +94,7 @@ $excludeKeys = [
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="telnet/css/styles.css">
+<!--    <link rel="stylesheet" href="telnet/css/styles.css">-->
     <title>Узел</title>
 </head>
 <body>
@@ -125,8 +109,7 @@ $excludeKeys = [
     <tr>
         <td class='even_th'>Статус:</td>
         <td><?= $severity ?></td>
-        <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $severity ?>.png'
-                                                                alt='<?= $severity ?>' title='<?= $severity ?>'></td>
+        <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $severity ?>.png' alt='<?= $severity ?>' title='<?= $severity ?>'></td>
     </tr>
 
     <?php if (isset($results['alarm_events'])) : ?>
@@ -134,10 +117,7 @@ $excludeKeys = [
             <tr>
                 <td class='even_th'><b>Тревога</b>:</td>
                 <td><?= $value['message'] . " " . $value['event_timestamp'] ?></td>
-                <td style='padding:0;width:15px;text-align:center'><img width=16
-                                                                        src='img/err_<?= $value['severity_name'] ?>.png'
-                                                                        alt='<?= $value['severity_name'] ?>'
-                                                                        title='<?= $severity ?>'></td>
+                <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $value['severity_name'] ?>.png' alt='<?= $value['severity_name'] ?>' title='<?= $severity ?>'></td>
             </tr>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -156,8 +136,7 @@ $excludeKeys = [
             <tr>
                 <td class='even_th'><?= $value['description'] ?></td>
                 <td><?= $value['idata_value'] ?></td>
-                <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $valueImg ?>.png'
-                                                                        alt='<?= $valueImg ?>' title='<?= $valueImg ?>'>
+                <td style='padding:0;width:15px;text-align:center'><img width=16 src='img/err_<?= $valueImg ?>.png' alt='<?= $valueImg ?>' title='<?= $valueImg ?>'>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -257,9 +236,6 @@ $excludeKeys = [
 </table>
 
 
-
-
-
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
@@ -277,9 +253,6 @@ $excludeKeys = [
         });
 
     });
-
-
-
 
 </script>
 

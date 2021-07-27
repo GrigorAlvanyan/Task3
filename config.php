@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'is_local' => true,
+    'is_local' => true,//
     'severityStatuses' => [
         '0' => 'normal',
         '1' => 'warning',

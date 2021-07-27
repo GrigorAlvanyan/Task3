@@ -257,13 +257,11 @@ function getResult($connection, $nodeName, $filteredNames, $severityStatuses, $s
         return ['error' => $errorsMessage['items'] . __LINE__];
     }
 
-    //check is idata table exists
     $idataTable = $idataTableValues['idatatTable'];
     $tableExist = checkIsTableExist($idataTable, $connection);
     if ($tableExist === null) {
         return ['error' => $idataTable . $errorsMessage['table'] . __LINE__];
     }
-    //get idata values
     $itemIds = $idataTableValues['itemIds'];
     $resultValuesData = getIdata($connection, $itemIds, $today, $idataTable, $errorsMessage);
     if ($resultValuesData === null) {
@@ -290,3 +288,4 @@ function configIdataRanges($configRanges, $arrValues)
     }
     return $arrValues;
 }
+

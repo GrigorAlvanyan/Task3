@@ -18,7 +18,7 @@ $telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs[
 if (isset($_GET['restart']) && $_GET['restart']) {
     $command = 'reboot';
 //    $rebootResult = $telnet->exec($command);
-    dd($command);die;
+//    dd($command);die;
 //    $cmdResults = linesRemove($rebootResult);
 //    $associatedLines = getAssociatedStations($cmdResults);
 //    $associatedLines = isset($associatedLines) && !empty($associatedLines) ? $associatedLines : [];

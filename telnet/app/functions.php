@@ -28,11 +28,9 @@ function getAssociatedStations($associatedStationLines) {
 
     $associatedStations = [];
     $mac = '';
-//    dd($associatedStationLines);
     foreach ($associatedStationLines as $key => $line) {
 
         $macAddress = explode('  ', $line);
-//        dd($macAddress);
         if (isset($macAddress[0]) && isValidMacAddress($macAddress[0])) {
             $mac = $macAddress[0];
             $associatedStations[$mac]['mac'] = $mac;
@@ -160,25 +158,41 @@ function getDhcpLeases($dhcpLeasesFileLines) {
     return $dhcpLeases;
 }
 
-$macaddressIo = file_get_contents('../files/macaddress_io-db.json');
-$macaddressIo = json_decode($macaddressIo);
+//todo need optimization
+function getDeviceNameByMacAddress($macAddress)
+{
+    $deviceName = '';
+    $filePath = '../files/macaddress_io-db.json';
+    if (!file_exists($filePath)) {
+        return $deviceName;
+    }
 
-//echo '<pre>';
-//print_r($macaddressIo);
-echo $macaddressIo;
-die;
+    $macaddressIo = file_get_contents($filePath);
+    $macaddressIo = json_decode($macaddressIo, 1);
+
+    foreach ($macaddressIo as $item) {
+        $mac = strtolower($item['oui']);
+        $macAddress = strtolower($macAddress);
+        if ($mac == $macAddress) {
+            $deviceName = $item['companyName'];
+        }
+    }
+
+    return $deviceName;
+}
+
+
+
 
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
-//    echo __DIR__;die;
 
-//    echo '<pre>';
-//    print_r($associatedLines);
-//    die;
+
     foreach ($associatedLines as $key => $associatedValue) {
-        echo '<pre>';
-        print_r($key);
-//        dd($key);
+
+        $mac = substr($key,0,8);
+        $name = getDeviceNameByMacAddress($mac);
+        $associatedLines[$key]['brand'] = $name;
         foreach ($dhcpResultArr as $models) {
             foreach ($models as $model){
                 if(strcasecmp($key, $model) == 0){
@@ -187,9 +201,7 @@ function nameOfMacAddress($associatedLines, $dhcpResultArr)
             }
         }
     }
-//    echo '<pre>';
-//    print_r($associatedLines);
-//    die;
+
     return $associatedLines;
 }
 
