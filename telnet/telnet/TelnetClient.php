@@ -525,6 +525,28 @@ class TelnetClient {
 	}
 
 
+    public function su($password, $password_prompt = 'Password:') {
+        $prompt = $this->regex_prompt;
+        try {
+            $su = $this->write('su');
+            if (!is_null($password_prompt)) {
+                $this->setPrompt($password_prompt);
+                $this->waitPrompt($this->do_get_remaining_data);
+                $a = $this->write($password);
+            }
+
+            //Reset prompt
+            $this->regex_prompt = $prompt;
+
+            $this->waitPrompt($this->do_get_remaining_data);
+        } catch (\Exception $e) {
+            throw new LoginException("Change to SU failed", 0, $e);
+        }
+
+        return $a;
+    }
+
+
 	/**
 	 * @param boolean $enable true if all remaining data is to be fetched after the prompt is found, false otherwise
 	 * @return void

@@ -1,5 +1,27 @@
 <?php
 
+
+
+$connect = @fsockopen('10.4.91.84', 23);
+//        print_r($connect);die;
+//    die;
+if($connect){
+    $details = '';
+
+    fputs ($connect , "admin\r\n");
+            fputs ($connect , "q12kl79g\r\n");
+            fputs ($connect , "ls\r\n");
+    $out = fgets ($connect, 1024);
+    $details .= $out."\n";
+    var_dump($details);die;
+    fputs ($connect , "MAIL FROM: <$fromemail>\r\n");
+    //$from = fgets ($connect, 1024);
+    fputs ($connect , "RCPT TO: <$toemail>\r\n");
+    //$to = fgets ($connect, 1024);
+    fputs ($connect , "QUIT");
+    fclose($connect);
+}
+
 error_reporting(E_ALL);
 
 define('ROOT_DIR', __DIR__);

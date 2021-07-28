@@ -14,10 +14,72 @@ if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
 
 $telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
+
 if (isset($_GET['restart']) && $_GET['restart']) {
-    $command = 'reboot';
-    $rebootResult = $telnet->exec($command);
+
+        $connect = @fsockopen('10.4.91.84', 23);
+//        print_r($connect);die;
+    //    die;
+        if($connect){
+            $details = '';
+
+            fputs ($connect , "admin'\r\n");
+//            fputs ($connect , "q12kl79g'\r\n");
+//            fputs ($connect , "admin'\r\n");
+            $out = fgets ($connect, 1024);
+            $details .= $out."\n";
+            var_dump($details);die;
+            fputs ($connect , "MAIL FROM: <$fromemail>\r\n");
+            //$from = fgets ($connect, 1024);
+            fputs ($connect , "RCPT TO: <$toemail>\r\n");
+            //$to = fgets ($connect, 1024);
+            fputs ($connect , "QUIT");
+            fclose($connect);
+        }
+
+
+
+
+    $command = '"echo q12kl79g | /usr/bin/su -S reboot';
+
+    $suResult = $telnet->exec($command);
+
+//    $telnet->setPrompt('Password: ');
+//    $suResult = $telnet->exec('q12kl79g');
+    echo '<pre>';
+    print_r($suResult);
+    die;
+
+    $a = $telnet->su('q12kl79g');
+    print_r($a);die;
+    $cmdResult = $telnet->exec('su', false);
+
+    die;
+
+    $command = 'cat /tmp/dhcp.leases';
+    $cmdResult = $telnet->exec($command);
+    $cmdResults = linesRemove($cmdResult);
+    $associatedLines = getAssociatedStations($cmdResults);
+//    echo '<pre>';
+//    print_r($associatedLines);
+//    $command = 'su';
+//    $suResult = $telnet->exec($command);
+//    $command = 'q12kl79g';
+//    $suResult = $telnet->exec($command);
+
+//    echo '<pre>';
+//    print_r($suResult);
+    ;
+//    $command = 'q12kl79g';
+//    $suResult = $telnet->exec($command);
+//    $command = 'reboot';
+//    $rebootResult = $telnet->exec($command);
 }
+
+//$command = 'su';
+//$cmdResult = $telnet->exec($command);
+//echo '<pre>';
+//print_r($cmdResult);die;
 
 
 $command = 'iwinfo wlan0 assoclist';

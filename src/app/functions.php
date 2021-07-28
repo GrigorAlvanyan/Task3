@@ -71,8 +71,12 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
                                     $val = $cols->item($i)->nodeValue . ' ';
                                     $tablesName["{$col[$item]}"] = $val;
                                 }
+
                                 $macAddressTable = $tablesName;
                                 $macAddressTables[] = $macAddressTable;
+//                                echo '<pre>';
+//                                print_r($macAddressTables);
+//                                die;
                             }
                         }
                     }
