@@ -204,4 +204,58 @@ function nameOfMacAddress($associatedLines, $dhcpResultArr)
 }
 
 
+function secondsToWords($seconds) {
+    $days = (int)($seconds / 86400);
+    $hours = (int)(($seconds - ($days * 86400)) / 3600);
+    $mins = (int)(($seconds - $days * 86400 - $hours * 3600) / 60);
+    $secs = (int)($seconds - ($days * 86400) - ($hours * 3600) - ($mins * 60));
+    return sprintf("%ds", $secs);
+}
+
+
+
+//todo needs refactoring
+function getUptime($uptimeResult)
+{
+//    dd($uptimeResult);die;
+    $live = "17:36:54 up 1 day, 22:44,  load average: 0.49, 0.44, 0.38";
+    $li = "17:36:54 22,  load average: 0.49, 0.44, 0.38";
+    $dayValue = '';
+//dd($uptimeResult);die;
+    $uptimeResultvalues = explode(', ',$uptimeResult[1]);
+//    $uptimeResultvalues = explode(', ',$li);
+//    dd($uptimeResultvalues);die;
+        if(strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
+            $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
+            if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
+                $dayValue[3] = 'd';
+            }
+            unset($dayValue[0], $dayValue[1]);
+
+            $dayValue = implode('', $dayValue);
+    } else {
+            $uptimeResultvalues[1] =  explode(' ', $uptimeResultvalues[0])[1];
+        }
+
+    if(strpos($uptimeResultvalues[1], ':')){
+        $hourMinut = explode(':', $uptimeResultvalues[1]);
+//        dd($hourMinut);die;
+//        dd($hourMinut[1]);die;
+        $hourMinut[0] .= 'h';
+        $hourMinut[1] .= 'm';
+        $dateValue = implode(' ', $hourMinut);
+    } else {
+        $hourMinut = explode(' ', $uptimeResultvalues[1]);
+
+//        $hourMinut[0] = '0h'.' '.$hourMinut[0];
+        $hourMinut[1] = 'm';
+        $dateValue = implode('', $hourMinut);
+
+    }
+    $uptime =  $dayValue .' '.$dateValue ;
+    $uptime .= ' ' . secondsToWords(time());
+
+    return $uptime;
+}
+
 

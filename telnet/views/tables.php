@@ -5,7 +5,22 @@
     </a>
 </div>
 
+<?php if(!empty($uptimeResultLine)) : ?>
+<table class="table_1">
+    <tr>
+        <th colspan=2><b>System</b></th>
+    </tr>
+    <tr>
+        <td class='even_th' width="250px">Local Time</td>
+        <td><?= $localTimeResultLine ?></td>
+    </tr>
+    <tr>
+        <td class='even_th' width="250px">Uptime</td>
+        <td><?= $uptimeResultLine ?></td>
+    </tr>
 
+</table>
+<?php endif; ?>
 
 <?php if(!empty($dhcpResultArr)) : ?>
 

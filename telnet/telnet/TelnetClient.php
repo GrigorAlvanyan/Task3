@@ -525,14 +525,13 @@ class TelnetClient {
 	}
 
 
-    public function su($password, $password_prompt = 'Password:') {
+    public function su($command, $password, $password_prompt = 'Password:') {
         $prompt = $this->regex_prompt;
         try {
-            $su = $this->write('su');
             if (!is_null($password_prompt)) {
                 $this->setPrompt($password_prompt);
                 $this->waitPrompt($this->do_get_remaining_data);
-                $a = $this->write($password);
+                $this->write($password);
             }
 
             //Reset prompt
@@ -540,11 +539,43 @@ class TelnetClient {
 
             $this->waitPrompt($this->do_get_remaining_data);
         } catch (\Exception $e) {
-            throw new LoginException("Change to SU failed", 0, $e);
+            throw new LoginException("command failed", 0, $e);
         }
 
-        return $a;
+        return self::TELNET_OK;
     }
+
+
+
+
+//    public function su($password, $password_prompt = 'Password:') {
+//        $prompt = $this->regex_prompt;
+//        try {
+////            $su = $this->exec('su');
+////            var_dump($su);die;
+//            if (!is_null($password_prompt)) {
+////                $this->setPrompt($password_prompt);
+////                $this->waitPrompt($this->do_get_remaining_data);
+//                $c = "echo '$password' | su -c 'uci show network.wan1.ifname' \r\n";
+//                $su = $this->write('su', false);
+////                $su = $this->sendCommand($c, false);
+////
+////                echo $c;
+////                $a = shell_exec($c);
+//////                $a = exec('echo -S' . $password . ' | su ls -la', $o, $r);
+////                var_dump($a);die;
+//            }
+////            var_dump($a);die;
+//            //Reset prompt
+////            $this->regex_prompt = $prompt;
+//
+//            $this->waitPrompt($this->do_get_remaining_data);
+//        } catch (\Exception $e) {
+//            throw new LoginException("Change to SU failed", 0, $e);
+//        }
+//
+//        return $su;
+//    }
 
 
 	/**

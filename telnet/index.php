@@ -2,6 +2,8 @@
 
 define('ROOT_DIR', __DIR__);
 
+require_once ROOT_DIR . '/../helpers.php';
+
 require_once ROOT_DIR . '/telnet/TelnetClient.php';
 require_once ROOT_DIR . '/app/functions.php';
 $configs = include ROOT_DIR . '/../config.php';
@@ -15,71 +17,38 @@ if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
 $telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
 
+
+
 if (isset($_GET['restart']) && $_GET['restart']) {
 
-        $connect = @fsockopen('10.4.91.84', 23);
-//        print_r($connect);die;
-    //    die;
-        if($connect){
-            $details = '';
-
-            fputs ($connect , "admin'\r\n");
-//            fputs ($connect , "q12kl79g'\r\n");
-//            fputs ($connect , "admin'\r\n");
-            $out = fgets ($connect, 1024);
-            $details .= $out."\n";
-            var_dump($details);die;
-            fputs ($connect , "MAIL FROM: <$fromemail>\r\n");
-            //$from = fgets ($connect, 1024);
-            fputs ($connect , "RCPT TO: <$toemail>\r\n");
-            //$to = fgets ($connect, 1024);
-            fputs ($connect , "QUIT");
-            fclose($connect);
-        }
 
 
 
 
-    $command = '"echo q12kl79g | /usr/bin/su -S reboot';
 
-    $suResult = $telnet->exec($command);
+
+//    $command = 'su';
+//    $su = $telnet->su('q12kl79g');
+
+//    $telnet->connect();
+//    $telnet->setPrompt('$');
+//    $su = $telnet->su('su', 'q12kl79g');
+
+
+//    var_dump($su);die;
+//    $cmdResult = $telnet->exec($command);
+//    die;
+
+
+
+//    $command = '"echo q12kl79g | /usr/bin/su -S reboot';
+//
+//    $suResult = $telnet->exec($command);
 
 //    $telnet->setPrompt('Password: ');
 //    $suResult = $telnet->exec('q12kl79g');
-    echo '<pre>';
-    print_r($suResult);
-    die;
 
-    $a = $telnet->su('q12kl79g');
-    print_r($a);die;
-    $cmdResult = $telnet->exec('su', false);
-
-    die;
-
-    $command = 'cat /tmp/dhcp.leases';
-    $cmdResult = $telnet->exec($command);
-    $cmdResults = linesRemove($cmdResult);
-    $associatedLines = getAssociatedStations($cmdResults);
-//    echo '<pre>';
-//    print_r($associatedLines);
-//    $command = 'su';
-//    $suResult = $telnet->exec($command);
-//    $command = 'q12kl79g';
-//    $suResult = $telnet->exec($command);
-
-//    echo '<pre>';
-//    print_r($suResult);
-    ;
-//    $command = 'q12kl79g';
-//    $suResult = $telnet->exec($command);
-//    $command = 'reboot';
-//    $rebootResult = $telnet->exec($command);
 }
-
-//$command = 'su';
-//$cmdResult = $telnet->exec($command);
-//echo '<pre>';
-//print_r($cmdResult);die;
 
 
 $command = 'iwinfo wlan0 assoclist';
@@ -106,45 +75,32 @@ $nameOfMacAddress = isset($nameOfMacAddress) && !empty($nameOfMacAddress) ? $nam
 
 $command = 'uptime';
 $uptimeResult = $telnet->exec($command);
+dd($uptimeResult);die;
 $uptimeResult = linesRemove($uptimeResult);
 $uptimeResultLine = getUptime($uptimeResult);
-
+$uptimeResultLine = isset($uptimeResultLine) && !empty($uptimeResultLine) ? $uptimeResultLine : [];
+//dd($uptimeResultLine);die;
+//dd($uptimeResultLine);die;
 
 $command = 'date';
 $dateResult = $telnet->exec($command);
 $dateResults = linesRemove($dateResult);
+//dd($dateResults);die;
+$localTimeResultLine = getLocalTime($dateResults);
+$localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
 
-//todo needs refactoring
-function getUptime($uptimeResult)
-{
-//    $upditeValues = [];
-//    $uptimeResultvalues = explode(', ',$uptimeResult[1]);
-//    $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
-//
-//    unset($dayValue[0]);
-//    unset($dayValue[1]);
-//    dd($dayValue);die;
-//    $dayValue[3] = 'd';
-//    $dayValue = implode('',$dayValue);
-//    $upditeValues['day'] = $dayValue;
-//    if(strpos($uptimeResultvalues[1], ':')){
-//        $hourMinut = explode(':', $uptimeResultvalues[1]);
-//        $hourMinut[0] = $hourMinut[0] . 'h';
-//        $hourMinut[1] = $hourMinut[1] . 'm';
-//        $dateValue = implode(' ', $hourMinut);
-//    } else {
-//        $hourMinut = explode(' ', $uptimeResultvalues[1]);
-//        $hourMinut[0] = '0h'.' '.$hourMinut[0];
-//        $hourMinut[1] = 'm';
-//        $dateValue = implode('', $hourMinut);
-//
-//    }
-//    $dayValue =  $dayValue .' '.$dateValue ;
-//
-//    return $dayValue;
+function getLocalTime($dateResults) {
+    $line = explode(' ',$dateResults[1]);
+    $lineSize = count($line);
+    $lineSize -= 2;
+    unset($line[$lineSize]);
+    $line = implode(' ', $line);
+    return $line;
 }
 
 
+" Thu Jul 29 15:26:40 AMT 2021";
+" Thu Jul 29 15:27:20 2021";
 
 
 
