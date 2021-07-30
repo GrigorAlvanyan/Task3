@@ -236,9 +236,24 @@ $excludeKeys = [
                                     </div>
                                 <?php endforeach; ?>
                             </td>
+                        </tr>
 
-                            </tr>
                     <?php endforeach; ?>
+                        <tr>
+                            <td>
+                                <button id="get_tables">
+                                    <span style="display: block; float: left">Telnet info</span>
+                                    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
+                                </button>
+                            </td>
+                            <td>
+                                <div id="restartRouter" style="display: none">
+                                    <a href="javascript:void(0)">
+                                        <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                 <?php elseif(isset($macAddressesValue) && empty($macAddressesValue)  && empty($errorWrongMacAddress)) :?>
                 <tr>
                     <td nowrap="nowrap"><?php echo 'No Mac Address'; ?></td>
@@ -279,6 +294,7 @@ $excludeKeys = [
                 success: function(result) {
                     $('.preloader').css('display', 'none')
                     $("#telnet_html").html(result);
+                    $('#restartRouter').css('display', 'block')
                 }
             });
         });
@@ -287,10 +303,10 @@ $excludeKeys = [
 
 </script>
 
-<button id="get_tables">
-    <span style="display: block; float: left">Telnet info</span>
-    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
-</button>
+<!--<button id="get_tables">-->
+<!--    <span style="display: block; float: left">Telnet info</span>-->
+<!--    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">-->
+<!--</button>-->
 
 <div id="telnet_html"></div>
 

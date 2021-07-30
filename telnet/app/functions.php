@@ -13,7 +13,6 @@ function telnetConnection($ip, $port, $username, $password, $prompt = '$')
 }
 
 
-
 function isValidMacAddress($mac)
 {
     if (preg_match('/^([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}$/', $mac)) {
@@ -22,43 +21,67 @@ function isValidMacAddress($mac)
 }
 
 
-function getAssociatedStations($associatedStationLines) {
-
+function getAssociatedStations($associatedStationLines)
+{
     $associatedStations = [];
     $mac = '';
     foreach ($associatedStationLines as $key => $line) {
 
         $macAddress = explode('  ', $line);
+
         if (isset($macAddress[0]) && isValidMacAddress($macAddress[0])) {
             $mac = $macAddress[0];
             $associatedStations[$mac]['mac'] = $mac;
-            if (isset($macAddress[1]) && !empty($macAddress[1])){
+            if (isset($macAddress[1]) && !empty($macAddress[1])) {
                 $signal = explode(' (', $macAddress[1]);
                 $associatedStations[$mac]['signal'] = $signal[0];
+                $signals = explode('/', $signal[0]);
+                $associatedStations[$mac]['dBmFrom'] = (float)getdBmValue($signals[0]);
+                $associatedStations[$mac]['dBmTo'] = (float)getdBmValue($signals[1]);
             }
         } elseif (strpos($line, 'RX:')) {
-            $rxLine = trim($line);
-            $rxLine = substr($rxLine, 0, strpos($rxLine, '  '));
-            $rxLine = explode(', ', $rxLine);
-            if (count($rxLine) > 3) {
-                unset($rxLine[count($rxLine) - 1]);
-            }
-            unset($rxLine[count($rxLine)]);
-            $rxLine = implode(', ',$rxLine);
+            $rxLine = getRXTXLine($line);
             $associatedStations[$mac]['rx'] = $rxLine;
+            $associatedStations[$mac]['rxValue'] = (float)getRxTx($rxLine);;
         } elseif (strpos($line, 'TX:')) {
-            $txLine = trim($line);
-            $txLine = substr($txLine, 0, strpos($txLine, '  '));
-            $txLine = explode(', ', $txLine);
-            if (count($txLine) > 3) {
-                unset($txLine[count($txLine) - 1]);
-            }
-            $txLine = implode(', ',$txLine);
+            $txLine = getRXTXLine($line);
             $associatedStations[$mac]['tx'] = $txLine;
+            $associatedStations[$mac]['txValue'] = (float)getRxTx($txLine);;
         }
-
     }
     return $associatedStations;
+}
+
+
+
+function getRXTXLine($line)
+{
+    $lineValue = trim($line);
+    $lineValue = substr($lineValue, 0, strpos($lineValue, '  '));
+    $lineValue = explode(', ', $lineValue);
+    if (count($lineValue) > 3) {
+        unset($lineValue[count($lineValue) - 1]);
+    }
+    unset($lineValue[count($lineValue)]);
+    $lineValue = implode(', ', $lineValue);
+
+    return $lineValue;
+}
+
+
+
+function getdBmValue($dBmValue)
+{
+    $dBmValue = explode(' ', ltrim($dBmValue));
+   return $dBmValue[0];
+}
+
+
+function getRxTx($values)
+{
+    $value = explode(': ', $values)[1];
+    $value = explode(' ',$value)[0];
+    return $value;
 }
 
 function getWireless($iwinfoResults)
@@ -100,7 +123,6 @@ function getWireless($iwinfoResults)
             $wireless['Encryption'] = $str[1];
         }
     }
-
     return $wireless;
 }
 
@@ -180,8 +202,6 @@ function getDeviceNameByMacAddress($macAddress)
 }
 
 
-
-
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
 
@@ -217,40 +237,34 @@ function secondsToWords($seconds) {
 //todo needs refactoring
 function getUptime($uptimeResult)
 {
-//    dd($uptimeResult);die;
-    $live = "17:36:54 up 1 day, 22:44,  load average: 0.49, 0.44, 0.38";
-    $li = "17:36:54 22,  load average: 0.49, 0.44, 0.38";
     $dayValue = '';
-//dd($uptimeResult);die;
     $uptimeResultvalues = explode(', ',$uptimeResult[1]);
-//    $uptimeResultvalues = explode(', ',$li);
-//    dd($uptimeResultvalues);die;
         if(strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
             $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
             if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
                 $dayValue[3] = 'd';
             }
             unset($dayValue[0], $dayValue[1]);
-
             $dayValue = implode('', $dayValue);
     } else {
             $uptimeResultvalues[1] =  explode(' ', $uptimeResultvalues[0])[1];
         }
-
     if(strpos($uptimeResultvalues[1], ':')){
-        $hourMinut = explode(':', $uptimeResultvalues[1]);
-//        dd($hourMinut);die;
-//        dd($hourMinut[1]);die;
-        $hourMinut[0] .= 'h';
-        $hourMinut[1] .= 'm';
-        $dateValue = implode(' ', $hourMinut);
-    } else {
-        $hourMinut = explode(' ', $uptimeResultvalues[1]);
 
-//        $hourMinut[0] = '0h'.' '.$hourMinut[0];
+        $hourMinut = explode(':', $uptimeResultvalues[1]);
+        $hourMinut[0] .= 'h';
+        if(strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
+            $hourMinut[1] = $hourMinut[1][1];
+        }
+        $hourMinut[1] .= 'm';
+
+        $dateValue = implode(' ', $hourMinut);
+    } elseif(strpos($uptimeResultvalues[1], 'min')){
+
+    }  else {
+        $hourMinut = explode(' ', $uptimeResultvalues[1]);
         $hourMinut[1] = 'm';
         $dateValue = implode('', $hourMinut);
-
     }
     $uptime =  $dayValue .' '.$dateValue ;
     $uptime .= ' ' . secondsToWords(time());
@@ -258,4 +272,40 @@ function getUptime($uptimeResult)
     return $uptime;
 }
 
+function getLocalTime($dateResults) {
+    $line = explode(' ',$dateResults[1]);
+    $lineSize = count($line);
+    $lineSize -= 2;
+    unset($line[$lineSize]);
+    $line = implode(' ', $line);
+    return $line;
+}
 
+//todo needs refactoring
+function getSignal($associatedLines)
+{
+//dd($associatedLines);die;
+    foreach ($associatedLines as $macAddress){
+        $tx = $macAddress['txValue'];
+        $rx = $macAddress['rxValue'];
+//        dd($tx);
+//        dd($rx);
+
+
+
+        if ($rx > 0 && $rx <= ($tx - ($tx / 5) * 4)) {
+            echo 'class_1';
+        } elseif ( $rx > ($tx - ($tx / 5) * 4) && $rx <= ($tx - ($tx / 5) * 3)) {
+            echo 'class_2';
+        } elseif ( $rx > ($tx - ($tx / 5) * 3) && $rx <= ($tx - ($tx / 5) * 2)) {
+            echo 'class_3';
+        } elseif ( $rx > ($tx - ($tx / 5) * 2) && $rx <= ($tx - ($tx / 5) * 1)) {
+            echo 'class_4';
+        } elseif ( $rx > ($tx - ($tx / 5) * 1) && $rx <= $tx) {
+            echo 'class_5';
+        }
+    }
+
+
+
+}
