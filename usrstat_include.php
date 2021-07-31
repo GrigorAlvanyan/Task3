@@ -281,12 +281,12 @@ $excludeKeys = [
     <?php endif; ?>
 </table>
 
-
+<?//= dd(getPathTo('/telnet/index.php'));die; ?>
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                url: 'telnet/index.php',
+                url: "<?=getPathTo('/telnet/index.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')

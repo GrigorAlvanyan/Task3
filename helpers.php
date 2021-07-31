@@ -18,6 +18,30 @@ function isLocal()
     return false;
 }
 
+function serverUri($withQueryParams = true)
+{
+    $uri = $_SERVER['REQUEST_URI'];
+
+    if (!$withQueryParams) {
+        $uri = substr($uri, 0, strpos($uri, '?'));
+    }
+
+    return $uri;
+}
+
+
+function getPathTo($path)
+{
+    
+    $path = ltrim($path, '/');
+
+    $uri = dirname(serverUri(false));
+
+    $path = $uri . '/' . $path;
+
+    return $path;
+}
+
 function dd($res)
 {
     echo '<pre>';

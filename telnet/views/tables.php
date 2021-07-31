@@ -103,13 +103,14 @@
         </table>
     <?php endif; ?>
 
+<?//= dd(getPathTo('/telnet/index.php'));die; ?>
 
 <script>
     $(document).ready(function(){
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
-                    url: 'telnet/index.php',
+                    url: "<?php echo getPathTo('/index.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
                         //
