@@ -9,80 +9,79 @@ require_once ROOT_DIR . '/telnet/Client.php';
 require_once ROOT_DIR . '/app/functions.php';
 $configs = include ROOT_DIR . '/../config.php';
 
-
 if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
     $eoc_ip = $_GET['eoc_ip'];
 } else {
     die("Invalid IP address");
 }
 
-$telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
-
+//$telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+$telnet = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+$telnet->connect();
 
 if (isset($_GET['restart']) && $_GET['restart']) {
-    $client = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+//    $html=$client->execute('iwinfo wlan0 assoclist');
+    $su=$telnet->execute('su');
+//    $html=$client->execute("su");
+    $su=$telnet->execute($configs['telnet_params']['super_user_password']);
+    $su=$telnet->execute("ls /");
+dd($su);
 
-    $client->connect();
-    $su = $client->execute("su");
-    $su = $client->execute($configs['telnet_params']['super_user_password']);
-    $su = $client->execute("ls /");
-    dd($su);
+//    $command = "cat /tmp/dhcp.leases";
+//    $cmdResult = $telnet->exec($command);
+//    dd($html);
+//    dd($cmdResult);die;
+////    dd($html);
+//    $client->disconnect('');
+//
+//    die;
 
-//    $uci = $client->execute( 'uci show network.wan1.ifname');
-//    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
-//    $reboot = $client->execute( 'reboot');
-//    $uci = $client->execute( "luci-bwc -i {$eth0}");
-//dd($uci);
-
-    die;
-
-    $client->disconnect('');
 }
 
+
 $command = 'iwinfo wlan0 assoclist';
-$cmdResult = $telnet->exec($command);
+$cmdResult = $telnet->execute($command);
 $cmdResults = linesRemove($cmdResult);
 $associatedTable = getAssociatedStations($cmdResults);
 $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
+//dd($associatedLines);die;
 
+//$signal = getSignal($associatedLines);
 
 $command = 'iwinfo';
-$iwinfoResult = $telnet->exec($command);
+$iwinfoResult = $telnet->execute($command);
 $iwinfoResults = linesRemove($iwinfoResult);
 $wireless = getWireless($iwinfoResults);
 $wireless = isset($wireless) && !empty($wireless) ? $wireless : [];
 
-
 $command = 'cat /tmp/dhcp.leases';
-$dhcpResult = $telnet->exec($command);
+$dhcpResult = $telnet->execute($command);
 $dhcpResults = linesRemove($dhcpResult);
 $dhcpResultArr = getDhcpLeases($dhcpResults);
 $dhcpResultArr = isset($dhcpResultArr) && !empty($dhcpResultArr) ?  $dhcpResultArr : [];
 
-
 $nameOfMacAddress = nameOfMacAddress($associatedLines, $dhcpResultArr);
 $nameOfMacAddress = isset($nameOfMacAddress) && !empty($nameOfMacAddress) ? $nameOfMacAddress : [];
 
-
 $command = 'uptime';
-$uptimeResult = $telnet->exec($command);
+$uptimeResult = $telnet->execute($command);
 $uptimeResult = linesRemove($uptimeResult);
 $uptimeResultLine = getUptime($uptimeResult);
 $uptimeResultLine = isset($uptimeResultLine) && !empty($uptimeResultLine) ? $uptimeResultLine : [];
 
-
 $command = 'date';
-$dateResult = $telnet->exec($command);
+$dateResult = $telnet->execute($command);
 $dateResults = linesRemove($dateResult);
 $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
 
 
-$signal = getSignal($associatedLines);
+" Thu Jul 29 15:26:40 AMT 2021";
+" Thu Jul 29 15:27:20 2021";
 
 
-$telnet->disconnect();
 
+$telnet->disconnect('');
 ?>
 
 <?php include ROOT_DIR . '/views/tables.php'?>

@@ -74,9 +74,6 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
 
                                 $macAddressTable = $tablesName;
                                 $macAddressTables[] = $macAddressTable;
-//                                echo '<pre>';
-//                                print_r($macAddressTables);
-//                                die;
                             }
                         }
                     }
@@ -87,7 +84,6 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
             return $macAddressTables;
     } else {
         return 'Result Table not found';
-//        return ;
     }
 
 }

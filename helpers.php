@@ -32,7 +32,7 @@ function serverUri($withQueryParams = true)
 
 function getPathTo($path)
 {
-    
+
     $path = ltrim($path, '/');
 
     $uri = dirname(serverUri(false));

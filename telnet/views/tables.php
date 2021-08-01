@@ -50,7 +50,7 @@
                     <tbody>
                     <tr>
                         <td style='padding:0;width:15px; vertical-align: top;'>
-                            <img width=16 src="img/associated_icon.png">
+                            <img width=16 src="img/<?= $signal?>.png">
                         </td>
                         <td class='even_th'>
                                 <strong>SSID:</strong><?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?>
@@ -91,7 +91,7 @@
 
                 <tr>
                     <td style='padding:0;width:15px;text-align: center'>
-                        <img width=16 src='img/associated_icon.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
+                        <img width=16 src='img/<?= $signal?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
                     </td>
                     <td class='even_th'><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
                     <td class='even_th'><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
@@ -103,24 +103,5 @@
         </table>
     <?php endif; ?>
 
-<?//= dd(getPathTo('/telnet/index.php'));die; ?>
 
-<script>
-    $(document).ready(function(){
-        $('#restartRouter a').click(function() {
-            if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
-                $.ajax({
-                    url: "<?php echo getPathTo('/index.php')?>",
-                    data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
-                    beforeSend: function () {
-                        //
-                    },
-                    success: function(result) {
-                        // console.log(result);
-                    }
-                });
-            }
-        })
-    });
 
-</script>

@@ -1,27 +1,5 @@
 <?php
 
-//
-//
-//$connect = @fsockopen('10.4.91.84', 23);
-////        print_r($connect);die;
-////    die;
-//if($connect){
-//    $details = '';
-//
-//    fputs ($connect , "admin\r\n");
-//            fputs ($connect , "q12kl79g\r\n");
-//            fputs ($connect , "ls\r\n");
-//    $out = fgets ($connect, 1024);
-//    $details .= $out."\n";
-//    var_dump($details);die;
-//    fputs ($connect , "MAIL FROM: <$fromemail>\r\n");
-//    //$from = fgets ($connect, 1024);
-//    fputs ($connect , "RCPT TO: <$toemail>\r\n");
-//    //$to = fgets ($connect, 1024);
-//    fputs ($connect , "QUIT");
-//    fclose($connect);
-//}
-
 error_reporting(E_ALL);
 
 define('ROOT_DIR', __DIR__);
@@ -43,10 +21,6 @@ if (isLocal()) {
 } else {
     $eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
 }
-
-//dd($eoc_ip);die;
-
-
 
 $nodeName = '';
 $severityValue = [];
@@ -281,7 +255,6 @@ $excludeKeys = [
     <?php endif; ?>
 </table>
 
-<?//= dd(getPathTo('/telnet/index.php'));die; ?>
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
@@ -299,14 +272,25 @@ $excludeKeys = [
             });
         });
 
+        $('#restartRouter a').click(function() {
+            if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
+                $.ajax({
+                    url: "<?php echo getPathTo('/telnet/index.php')?>",
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
+                    beforeSend: function () {
+                        //
+                    },
+                    success: function(result) {
+                        // console.log(result);
+                    }
+                });
+            }
+        })
     });
 
 </script>
 
-<!--<button id="get_tables">-->
-<!--    <span style="display: block; float: left">Telnet info</span>-->
-<!--    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">-->
-<!--</button>-->
+
 
 <div id="telnet_html"></div>
 

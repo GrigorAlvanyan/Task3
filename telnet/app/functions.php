@@ -26,9 +26,7 @@ function getAssociatedStations($associatedStationLines)
     $associatedStations = [];
     $mac = '';
     foreach ($associatedStationLines as $key => $line) {
-
         $macAddress = explode('  ', $line);
-
         if (isset($macAddress[0]) && isValidMacAddress($macAddress[0])) {
             $mac = $macAddress[0];
             $associatedStations[$mac]['mac'] = $mac;
@@ -53,7 +51,6 @@ function getAssociatedStations($associatedStationLines)
 }
 
 
-
 function getRXTXLine($line)
 {
     $lineValue = trim($line);
@@ -69,18 +66,19 @@ function getRXTXLine($line)
 }
 
 
-
 function getdBmValue($dBmValue)
 {
     $dBmValue = explode(' ', ltrim($dBmValue));
-   return $dBmValue[0];
+
+    return $dBmValue[0];
 }
 
 
 function getRxTx($values)
 {
     $value = explode(': ', $values)[1];
-    $value = explode(' ',$value)[0];
+    $value = explode(' ', $value)[0];
+
     return $value;
 }
 
@@ -89,7 +87,7 @@ function getWireless($iwinfoResults)
     $parsedIwinfo = [];
     foreach ($iwinfoResults as $iwinfoLine) {
         if (strpos($iwinfoLine, 'ESSID:')) {
-            $iwinfoLine = substr($iwinfoLine,  strpos($iwinfoLine, '  '));
+            $iwinfoLine = substr($iwinfoLine, strpos($iwinfoLine, '  '));
         }
 
         $parsedIwinfoLine = explode('  ', ltrim($iwinfoLine));
@@ -106,7 +104,7 @@ function getWireless($iwinfoResults)
     }
 
     $wireless = [];
-    foreach ($parsedIwinfo as  $str) {
+    foreach ($parsedIwinfo as $str) {
         $keys = '';
         $str = explode(': ', $str);
         $keys = $str[0];
@@ -127,7 +125,8 @@ function getWireless($iwinfoResults)
 }
 
 
-function linesRemove($arr){
+function linesRemove($arr)
+{
     unset($arr[0]);
     $resArrayCount = count($arr);
     unset($arr[$resArrayCount]);
@@ -137,16 +136,15 @@ function linesRemove($arr){
 
 function isValidTimeStamp($timestamp)
 {
-    return ((string) (int) $timestamp === $timestamp)
+    return ((string)(int)$timestamp === $timestamp)
         && ($timestamp <= PHP_INT_MAX)
         && ($timestamp >= ~PHP_INT_MAX);
 }
 
-function getDhcpLeases($dhcpLeasesFileLines) {
-
-
+function getDhcpLeases($dhcpLeasesFileLines)
+{
     $dhcpLeases = [];
-    foreach($dhcpLeasesFileLines as $key => $line) {
+    foreach ($dhcpLeasesFileLines as $key => $line) {
         $line = array_reverse(explode(' ', $line));
         unset($line[0]);
         foreach ($line as $item) {
@@ -154,14 +152,14 @@ function getDhcpLeases($dhcpLeasesFileLines) {
             if (isValidTimeStamp($item)) {
 
                 $presentTime = time();
-                $presentDate =  date('Y-m-d H:i:s', $presentTime);
+                $presentDate = date('Y-m-d H:i:s', $presentTime);
                 $timeDifference = $item - $presentTime;
                 $timeDifference = $presentTime - $timeDifference;
 
-                $oldDate=  date('Y-m-d H:i:s', $timeDifference);
+                $oldDate = date('Y-m-d H:i:s', $timeDifference);
 
                 $assigned_time = "{$oldDate}";
-                $completed_time= "{$presentDate}";
+                $completed_time = "{$presentDate}";
 
                 $d1 = new DateTime($assigned_time);
                 $d2 = new DateTime($completed_time);
@@ -204,16 +202,14 @@ function getDeviceNameByMacAddress($macAddress)
 
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
-
-
     foreach ($associatedLines as $key => $associatedValue) {
 
-        $mac = substr($key,0,8);
+        $mac = substr($key, 0, 8);
         $name = getDeviceNameByMacAddress($mac);
         $associatedLines[$key]['brand'] = $name;
         foreach ($dhcpResultArr as $models) {
-            foreach ($models as $model){
-                if(strcasecmp($key, $model) == 0){
+            foreach ($models as $model) {
+                if (strcasecmp($key, $model) == 0) {
                     $associatedLines[$key]['hostName'] = $models[0];
                 }
             }
@@ -224,7 +220,8 @@ function nameOfMacAddress($associatedLines, $dhcpResultArr)
 }
 
 
-function secondsToWords($seconds) {
+function secondsToWords($seconds)
+{
     $days = (int)($seconds / 86400);
     $hours = (int)(($seconds - ($days * 86400)) / 3600);
     $mins = (int)(($seconds - $days * 86400 - $hours * 3600) / 60);
@@ -238,42 +235,42 @@ function secondsToWords($seconds) {
 function getUptime($uptimeResult)
 {
     $dayValue = '';
-    $uptimeResultvalues = explode(', ',$uptimeResult[1]);
-        if(strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
-            $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
-            if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
-                $dayValue[3] = 'd';
-            }
-            unset($dayValue[0], $dayValue[1]);
-            $dayValue = implode('', $dayValue);
-    } else {
-            $uptimeResultvalues[1] =  explode(' ', $uptimeResultvalues[0])[1];
+    $uptimeResultvalues = explode(', ', $uptimeResult[1]);
+    if (strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
+        $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
+        if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
+            $dayValue[3] = 'd';
         }
-    if(strpos($uptimeResultvalues[1], ':')){
+        unset($dayValue[0], $dayValue[1]);
+        $dayValue = implode('', $dayValue);
+    } else {
+        $uptimeResultvalues[1] = explode(' ', $uptimeResultvalues[0])[1];
+    }
+    if (strpos($uptimeResultvalues[1], ':')) {
 
         $hourMinut = explode(':', $uptimeResultvalues[1]);
         $hourMinut[0] .= 'h';
-        if(strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
+        if (strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
             $hourMinut[1] = $hourMinut[1][1];
         }
         $hourMinut[1] .= 'm';
-
         $dateValue = implode(' ', $hourMinut);
-    } elseif(strpos($uptimeResultvalues[1], 'min')){
-
-    }  else {
+    } elseif (strpos($uptimeResultvalues[1], 'min')) {
+        $dateValue = str_replace(' min', 'm', $uptimeResultvalues[1]);
+    } else {
         $hourMinut = explode(' ', $uptimeResultvalues[1]);
         $hourMinut[1] = 'm';
         $dateValue = implode('', $hourMinut);
     }
-    $uptime =  $dayValue .' '.$dateValue ;
+    $uptime = $dayValue . ' ' . $dateValue;
     $uptime .= ' ' . secondsToWords(time());
 
     return $uptime;
 }
 
-function getLocalTime($dateResults) {
-    $line = explode(' ',$dateResults[1]);
+function getLocalTime($dateResults)
+{
+    $line = explode(' ', $dateResults[1]);
     $lineSize = count($line);
     $lineSize -= 2;
     unset($line[$lineSize]);
@@ -281,31 +278,24 @@ function getLocalTime($dateResults) {
     return $line;
 }
 
-//todo needs refactoring
 function getSignal($associatedLines)
 {
-//dd($associatedLines);die;
-    foreach ($associatedLines as $macAddress){
-        $tx = $macAddress['txValue'];
-        $rx = $macAddress['rxValue'];
-//        dd($tx);
-//        dd($rx);
+    $dBmphoto = 'signal-0';
+    foreach ($associatedLines as $macAddress) {
+        $tx = explode('-', $macAddress['dBmFrom'])[1];
+        $rx = explode('-', $macAddress['dBmTo'])[1];
 
 
-
-        if ($rx > 0 && $rx <= ($tx - ($tx / 5) * 4)) {
-            echo 'class_1';
-        } elseif ( $rx > ($tx - ($tx / 5) * 4) && $rx <= ($tx - ($tx / 5) * 3)) {
-            echo 'class_2';
-        } elseif ( $rx > ($tx - ($tx / 5) * 3) && $rx <= ($tx - ($tx / 5) * 2)) {
-            echo 'class_3';
-        } elseif ( $rx > ($tx - ($tx / 5) * 2) && $rx <= ($tx - ($tx / 5) * 1)) {
-            echo 'class_4';
-        } elseif ( $rx > ($tx - ($tx / 5) * 1) && $rx <= $tx) {
-            echo 'class_5';
+        if ($tx > 0 && $tx <= ($rx - ($rx / 4) * 3)) {
+            $dBmphoto = 'signal-0-25';
+        } elseif ($tx > ($rx - ($rx / 4) * 3) && $tx <= ($rx - ($rx / 4) * 2)) {
+            $dBmphoto = 'signal-25-50';
+        } elseif ($tx > ($rx - ($rx / 4) * 2) && $tx <= ($rx - ($rx / 4) * 1)) {
+            $dBmphoto = 'signal-50-75';
+        } elseif ($tx > ($rx - ($rx / 4) * 1) && $tx <= $rx) {
+            $dBmphoto = 'signal-75-100';
         }
     }
-
-
+    return $dBmphoto;
 
 }
