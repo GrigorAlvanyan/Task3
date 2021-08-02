@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 
 define('ROOT_DIR', __DIR__);
 
+
 require_once ROOT_DIR . '/helpers.php';
 require_once ROOT_DIR . '/src/db/functions.php';
 require_once ROOT_DIR . '/src/app/functions.php';
@@ -130,6 +131,7 @@ $excludeKeys = [
                 }
             }
             ?>
+
             <tr>
                 <td class='even_th'><?= $value['description'] ?></td>
                 <td><?= $value['idata_value'] ?></td>
@@ -197,7 +199,7 @@ $excludeKeys = [
                         ?>
                         <tr style="vertical-align: top;">
                             <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
-                            <td class='even_th'>
+                            <td>
                                 <?php foreach ($tdValues as  $td) : ?>
                                 <div><?=  $td['strValue'] ?></div>
                                 <?php endforeach; ?>
@@ -212,21 +214,6 @@ $excludeKeys = [
                         </tr>
 
                     <?php endforeach; ?>
-                        <tr>
-                            <td>
-                                <button id="get_tables">
-                                    <span style="display: block; float: left">Telnet info</span>
-                                    <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
-                                </button>
-                            </td>
-                            <td>
-                                <div id="restartRouter" style="display: none">
-                                    <a href="javascript:void(0)">
-                                        <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
                 <?php elseif(isset($macAddressesValue) && empty($macAddressesValue)  && empty($errorWrongMacAddress)) :?>
                 <tr>
                     <td nowrap="nowrap"><?php echo 'No Mac Address'; ?></td>
@@ -252,13 +239,36 @@ $excludeKeys = [
             <td nowrap="nowrap"><?= 'Wrong mac Address';?></td>
         </tr>
     <?php endif; ?>
+    <tr>
+        <td>
+            <button id="get_tables">
+                <span style="display: block; float: left">Telnet info</span>
+                <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
+            </button>
+        </td>
+        <td>
+            <div id="Traffic">
+                <a href="javascript:void(0)">
+                    <img src="img/traffic.png" alt="" style="width: 35px; height: 35px;">
+                </a>
+            </div>
+        </td>
+        <td>
+            <div id="restartRouter" style="display: none">
+                <a href="javascript:void(0)">
+                    <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
+                </a>
+            </div>
+        </td>
+
+    </tr>
 </table>
 
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                url: "<?=getPathTo('/telnet/index.php')?>",
+                url: "<?=getPathTo('/S1/telnet/index.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
@@ -274,26 +284,38 @@ $excludeKeys = [
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/index.php')?>",
+                    url: "<?php echo getPathTo('/S1/telnet/index.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
                         //
                     },
                     success: function(result) {
                         // console.log(result);
-                        // $("#restart_html").html(result)
+                        $("#telnet_html").html(result)
                     }
                 });
             }
+        })
+        $('#Traffic a').click(function() {
+                $.ajax({
+                    url: "<?php echo getPathTo('/S1/telnet/index.php')?>",
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic": true},
+                    beforeSend: function () {
+                        //
+                    },
+                    success: function(result) {
+                        console.log(123);
+                        // $("#telnet_html").html(result)
+                    }
+                });
         })
     });
 
 </script>
 
 
-
 <div id="telnet_html"></div>
-<div id="restart_html"></div>
+
 
 
 

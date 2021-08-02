@@ -40,9 +40,17 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $client->disconnect('');
 }
 
+
+if (isset($_GET['traffic']) && $_GET['traffic']) {
+
+    echo '11111111';
+    die;
+}
+
 $command = 'iwinfo wlan0 assoclist';
 $cmdResult = $telnet->exec($command);
 $cmdResults = linesRemove($cmdResult);
+
 $associatedTable = getAssociatedStations($cmdResults);
 $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
 
@@ -79,8 +87,11 @@ $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
 
 
-$signal = getSignal($associatedLines);
+$dBmSignal = getdBmSignal($associatedLines);
+$dBmSignal = isset($dBmSignal) && !empty($dBmSignal) ? $dBmSignal : '';
 
+$qualitySignal = getQualitySignal($wireless);
+$qualitySignal = isset($qualitySignal) && !empty($qualitySignal) ? $qualitySignal : '';
 
 $telnet->disconnect();
 

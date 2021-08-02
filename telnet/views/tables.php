@@ -1,20 +1,4 @@
 
-<?php //if(!empty($uciLines)) : ?>
-<!--    --><?php //foreach ($uciLines as $line) : ?>
-<!--        <table class="table_1">-->
-<!--            <tr>-->
-<!--                <th colspan=2><b>Timestamp</b></th>-->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>--><?//= $line ?><!--</td>-->
-<!--            </tr>-->
-<!--        </table>-->
-<!--    --><?php //endforeach; ?>
-<?php //endif; ?>
-
-
-
-
 <?php if(!empty($uptimeResultLine)) : ?>
 <table class="table_1">
     <tr>
@@ -36,7 +20,7 @@
 
     <table class="table_1">
         <tr>
-            <th><b>DHCP Leases</b></th>
+            <th colspan=4><b>DHCP Leases</b></th>
         </tr>
         <tr>
             <th><b>Hostname</b></th>
@@ -47,7 +31,7 @@
         <?php foreach ($dhcpResultArr as $dhcpResult) : ?>
             <tr>
                 <?php foreach ($dhcpResult as $res) : ?>
-                    <td class='even_th'><?php echo $res; ?></td>
+                    <td><?= $res; ?></td>
                 <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
@@ -57,42 +41,35 @@
 
 <?php if(!empty($wireless)) : ?>
     <table  class="table_1">
-        <tbody>
+        <th colspan=2><b>WLAN</b></th>
+            <tr>
+                <td style='padding:0;width:15px; vertical-align: top;'><img width=16 src="img/<?= $qualitySignal['icon']?>.png"></td>
+                <td><strong>SSID:</strong><?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?></td>
+            </tr>
+            <tr>
+                <td><?= $qualitySignal['result']?></td>
+                <td><strong>Channel:</strong><?php echo isset($wireless['Channel']) ? $wireless['Channel'] : ''?></td>
+            </tr>
         <tr>
-            <td width="10%"></td>
-            <td>
-                <table>
-                    <tbody>
-                    <tr>
-                        <td style='padding:0;width:15px; vertical-align: top;'>
-                            <img width=16 src="img/<?= $signal?>.png">
-                        </td>
-                        <td class='even_th'>
-                                <strong>SSID:</strong><?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?>
-                                <br>
-                                <strong>Channel:</strong><?php echo isset($wireless['Channel']) ? $wireless['Channel'] : ''?>
-                                <br>
-                                <strong>Bitrate:</strong><?php echo isset($wireless['Bitrate']) ? $wireless['Bitrate'] : ''?>
-                                <br>
-                                <strong>BSSID:</strong><?php echo isset($wireless['BSSID']) ? $wireless['BSSID'] : ''?>
-                                <br>
-                                <strong>Encryption:</strong><?php echo isset($wireless['Encryption']) ? $wireless['Encryption'] : ''?>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
+            <td></td>
+            <td><strong>Bitrate:</strong><?php echo isset($wireless['Bitrate']) ? $wireless['Bitrate'] : ''?></td>
         </tr>
-        </tbody>
+        <tr>
+            <td></td>
+            <td><strong>BSSID:</strong><?php echo isset($wireless['BSSID']) ? $wireless['BSSID'] : ''?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>Encryption:</strong><?php echo isset($wireless['Encryption']) ? $wireless['Encryption'] : ''?></td>
+        </tr>
     </table>
-
 <?php endif; ?>
 
 
 <?php if(!empty($nameOfMacAddress)) : ?>
         <table class="table_1">
             <tr>
-                <th><b>Associated Stations</b></th>
+                <th colspan=6><b>Associated Stations</b></th>
             </tr>
             <tr>
                 <th style="width:20px"></th>
@@ -106,13 +83,13 @@
 
                 <tr>
                     <td style='padding:0;width:15px;text-align: center'>
-                        <img width=16 src='img/<?= $signal?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
+                        <img width=16 src='img/<?=$dBmSignal?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
                     </td>
-                    <td class='even_th'><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
-                    <td class='even_th'><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
-                    <td class='even_th'><?php echo $res['mac'];?> </td>
-                    <td class='even_th'><?php echo $res['rx']; ?></td>
-                    <td class='even_th'><?php echo $res['tx']; ?></td>
+                    <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
+                    <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
+                    <td><?php echo $res['mac'];?> </td>
+                    <td><?php echo $res['rx']; ?></td>
+                    <td><?php echo $res['tx']; ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>
