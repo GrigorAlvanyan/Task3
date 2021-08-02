@@ -21,21 +21,19 @@ $telnet->connect();
 
 if (isset($_GET['restart']) && $_GET['restart']) {
 //    $html=$client->execute('iwinfo wlan0 assoclist');
-    $su=$telnet->execute('su');
-//    $html=$client->execute("su");
-    $su=$telnet->execute($configs['telnet_params']['super_user_password']);
-    $su=$telnet->execute("ls /");
-dd($su);
+    $su = $telnet->execute('su');
+    $su = $telnet->execute($configs['telnet_params']['super_user_password']);
+//    $su=$telnet->execute("ls /");
 
-//    $command = "cat /tmp/dhcp.leases";
-//    $cmdResult = $telnet->exec($command);
-//    dd($html);
-//    dd($cmdResult);die;
-////    dd($html);
-//    $client->disconnect('');
-//
-//    die;
 
+    $uci = $telnet->execute( 'uci show network.wan1.ifname');
+    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
+    $eth0 = 'luci-bwc -i'.' '.$eth0;
+
+//    $reboot = $client->execute( 'reboot');
+    $uci = $telnet->execute($eth0);
+    dd($uci);
+    die;
 }
 
 
@@ -44,9 +42,7 @@ $cmdResult = $telnet->execute($command);
 $cmdResults = linesRemove($cmdResult);
 $associatedTable = getAssociatedStations($cmdResults);
 $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
-//dd($associatedLines);die;
 
-//$signal = getSignal($associatedLines);
 
 $command = 'iwinfo';
 $iwinfoResult = $telnet->execute($command);
@@ -74,11 +70,6 @@ $dateResult = $telnet->execute($command);
 $dateResults = linesRemove($dateResult);
 $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
-
-
-" Thu Jul 29 15:26:40 AMT 2021";
-" Thu Jul 29 15:27:20 2021";
-
 
 
 $telnet->disconnect('');

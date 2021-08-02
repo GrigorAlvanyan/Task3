@@ -1,5 +1,4 @@
 <?php
-
 error_reporting(E_ALL);
 
 define('ROOT_DIR', __DIR__);
@@ -282,6 +281,7 @@ $excludeKeys = [
                     },
                     success: function(result) {
                         // console.log(result);
+                        $("#restart_html").html(result)
                     }
                 });
             }
@@ -293,7 +293,7 @@ $excludeKeys = [
 
 
 <div id="telnet_html"></div>
-
+<div id="restart_html"></div>
 
 
 

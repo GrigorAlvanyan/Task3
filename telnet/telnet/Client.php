@@ -113,7 +113,7 @@ class Client
     {
         $r = '';
         do {
-            $r .= fread($this->connection, 1000);
+            $r .= fread($this->connection, 10000); //length 1000
             $s = socket_get_status($this->connection);
         } while ($s['unread_bytes']);
         return $this->removeNonPrintableCharacters($r);

@@ -3,7 +3,6 @@
 define('ROOT_DIR', __DIR__);
 
 require_once ROOT_DIR . '/../helpers.php';
-
 require_once ROOT_DIR . '/telnet/TelnetClient.php';
 require_once ROOT_DIR . '/telnet/Client.php';
 require_once ROOT_DIR . '/app/functions.php';
@@ -23,18 +22,20 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $client = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
     $client->connect();
-    $su = $client->execute("su");
+    $su = $client->execute('su');
     $su = $client->execute($configs['telnet_params']['super_user_password']);
-    $su = $client->execute("ls /");
-    dd($su);
+//    $su = $client->execute("ls /");
+//    dd($su);
 
-//    $uci = $client->execute( 'uci show network.wan1.ifname');
-//    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
+    $uci = $client->execute( 'uci show network.wan1.ifname');
+    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
+    $eth0 = 'luci-bwc -i'.' '.$eth0;
+
 //    $reboot = $client->execute( 'reboot');
-//    $uci = $client->execute( "luci-bwc -i {$eth0}");
-//dd($uci);
+    $uci = $client->execute($eth0);
+    $uciLines = linesRemove($uci);
+    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
 
-    die;
 
     $client->disconnect('');
 }

@@ -376,9 +376,9 @@ return [
     ],
     'telnet_params'=>[
         'port' => 111,
-        'username' => '***',
-        'password' => '***',
-        'super_user_password' => '***'
+        'username' => '****',
+        'password' => '****',
+        'super_user_password' => '****'
     ]
 
 ];

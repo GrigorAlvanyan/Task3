@@ -235,6 +235,7 @@ function secondsToWords($seconds)
 function getUptime($uptimeResult)
 {
     $dayValue = '';
+    $dateValue = '';
     $uptimeResultvalues = explode(', ', $uptimeResult[1]);
     if (strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
         $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
@@ -244,10 +245,9 @@ function getUptime($uptimeResult)
         unset($dayValue[0], $dayValue[1]);
         $dayValue = implode('', $dayValue);
     } else {
-        $uptimeResultvalues[1] = explode(' ', $uptimeResultvalues[0])[1];
+        $uptimeResultvalues[1] = explode(' ', $uptimeResultvalues[0])[3];
     }
     if (strpos($uptimeResultvalues[1], ':')) {
-
         $hourMinut = explode(':', $uptimeResultvalues[1]);
         $hourMinut[0] .= 'h';
         if (strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
@@ -258,9 +258,9 @@ function getUptime($uptimeResult)
     } elseif (strpos($uptimeResultvalues[1], 'min')) {
         $dateValue = str_replace(' min', 'm', $uptimeResultvalues[1]);
     } else {
-        $hourMinut = explode(' ', $uptimeResultvalues[1]);
-        $hourMinut[1] = 'm';
-        $dateValue = implode('', $hourMinut);
+        $hourMinut = $uptimeResultvalues[1];
+        $hourMinut .= 'h';
+        $dateValue = $hourMinut;
     }
     $uptime = $dayValue . ' ' . $dateValue;
     $uptime .= ' ' . secondsToWords(time());

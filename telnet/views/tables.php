@@ -1,4 +1,20 @@
 
+<?php if(!empty($uciLines)) : ?>
+    <?php foreach ($uciLines as $line) : ?>
+        <table class="table_1">
+            <tr>
+                <th colspan=2><b>Timestamp</b></th>
+            </tr>
+            <tr>
+                <td class='even_th' width="250px">Local Time</td>
+                <td><?= $line ?></td>
+            </tr>
+        </table>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+
+
 
 <?php if(!empty($uptimeResultLine)) : ?>
 <table class="table_1">
