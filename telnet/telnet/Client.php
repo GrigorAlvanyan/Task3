@@ -5,7 +5,7 @@ class Client
 {
 
     var $uSleepTime = 150000; //default 1250000 //oindex = 800000
-    var $sleepTime = 150000; //default 1250000 // oindex = 800000
+    var $sleepTime = 1000000; //default 1250000 // oindex = 800000
 
     var $loginSleepTime = 1000000;
 

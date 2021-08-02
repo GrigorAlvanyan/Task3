@@ -4,17 +4,52 @@
     <tr>
         <th colspan=2><b>System</b></th>
     </tr>
-    <tr>
-        <td class='even_th' width="250px">Local Time</td>
-        <td><?= $localTimeResultLine ?></td>
-    </tr>
-    <tr>
-        <td class='even_th' width="250px">Uptime</td>
-        <td><?= $uptimeResultLine ?></td>
-    </tr>
-
+    <?php if(!empty($modelResult)) :?>
+        <tr>
+            <td class='even_th' width="250px">Model</td>
+            <td><?= $modelResult ?></td>
+        </tr>
+    <?php endif; ?>
+    <?php if(!empty($firmwareVersion)) :?>
+        <tr>
+            <td class='even_th' width="250px">Firmware Version</td>
+            <td><?= $firmwareVersion ?></td>
+        </tr>
+    <?php endif; ?>
+    <?php if(!empty($localTimeResultLine)) :?>
+        <tr>
+            <td class='even_th' width="250px">Local Time</td>
+            <td><?= $localTimeResultLine ?></td>
+        </tr>
+    <?php endif; ?>
+    <?php if(!empty($uptimeResultLine)) :?>
+        <tr>
+            <td class='even_th' width="250px">Uptime</td>
+            <td><?= $uptimeResultLine ?></td>
+        </tr>
+    <?php endif; ?>
 </table>
 <?php endif; ?>
+
+
+
+<?php if(!empty($networks)) : ?>
+    <table class="table_1">
+        <tr>
+            <th colspan=2><b>Network</b></th>
+        </tr>
+        <tr>
+            <td>IPv4 WAN Status</td>
+            <td>Service WAN</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>Type:</strong><?= $networks['proto'] ?></td>
+        </tr>
+    </table>
+<?php endif; ?>
+
+
 
 <?php if(!empty($dhcpResultArr)) : ?>
 
@@ -43,11 +78,13 @@
     <table  class="table_1">
         <th colspan=2><b>WLAN</b></th>
             <tr>
-                <td style='padding:0;width:15px; vertical-align: top;'><img width=16 src="img/<?= $qualitySignal['icon']?>.png"></td>
+                <?php if(!empty($qualitySignal)) : ?>
+                    <td style='padding:0;width:15px;text-align: center;'><img width=16 src="img/<?= $qualitySignal['icon']?>.png"></td>
+                <?php endif; ?>
                 <td><strong>SSID:</strong><?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?></td>
             </tr>
             <tr>
-                <td><?= $qualitySignal['result']?></td>
+                <td><small><?= $qualitySignal['result']?></small></td>
                 <td><strong>Channel:</strong><?php echo isset($wireless['Channel']) ? $wireless['Channel'] : ''?></td>
             </tr>
         <tr>
@@ -83,7 +120,7 @@
 
                 <tr>
                     <td style='padding:0;width:15px;text-align: center'>
-                        <img width=16 src='img/<?=$dBmSignal?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
+                        <img width=16 src='img/<?=$res['dBmSignal']?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
                     </td>
                     <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
                     <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>

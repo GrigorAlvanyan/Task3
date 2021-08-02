@@ -27,14 +27,20 @@ if (isset($_GET['restart']) && $_GET['restart']) {
 //    $su = $client->execute("ls /");
 //    dd($su);
 
-    $uci = $client->execute( 'uci show network.wan1.ifname');
-    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
-    $eth0 = 'luci-bwc -i'.' '.$eth0;
+    $command = 'ifstatus wan1';
+    $network = $client->execute($command);
+    $network = linesRemove($network);
+    $networks = getNetWork($network);
+    $networks = isset($networks) && !empty($networks) ? $networks : [];
+
+//    $uci = $client->execute( 'uci show network.wan1.ifname');
+//    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
+//    $eth0 = 'luci-bwc -i'.' '.$eth0;
 
 //    $reboot = $client->execute( 'reboot');
-    $uci = $client->execute($eth0);
-    $uciLines = linesRemove($uci);
-    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
+//    $uci = $client->execute($eth0);
+//    $uciLines = linesRemove($uci);
+//    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
 
 
     $client->disconnect('');
@@ -53,7 +59,6 @@ $cmdResults = linesRemove($cmdResult);
 
 $associatedTable = getAssociatedStations($cmdResults);
 $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
-
 
 $command = 'iwinfo';
 $iwinfoResult = $telnet->exec($command);
@@ -87,11 +92,25 @@ $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
 
 
-$dBmSignal = getdBmSignal($associatedLines);
-$dBmSignal = isset($dBmSignal) && !empty($dBmSignal) ? $dBmSignal : '';
-
 $qualitySignal = getQualitySignal($wireless);
 $qualitySignal = isset($qualitySignal) && !empty($qualitySignal) ? $qualitySignal : '';
+
+$command = 'getinfo -fw';
+$firmwareVersion = $telnet->exec($command);
+$firmwareVersion = getFirmwareVersion($firmwareVersion);
+$firmwareVersion = isset($firmwareVersion) && !empty($firmwareVersion) ? $firmwareVersion : '';
+
+$command = 'cat /tmp/sysinfo/model';
+$model = $telnet->exec($command);
+$model = linesRemove($model);
+$modelResult = getModel($model);
+$modelResult = isset($modelResult) && !empty($modelResult) ? $modelResult : '';
+
+//$command = 'getinfo -sn';
+//$model = $telnet->exec($command);
+////dd($model);die;
+
+
 
 $telnet->disconnect();
 

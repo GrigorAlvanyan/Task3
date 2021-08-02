@@ -34,8 +34,12 @@ function getAssociatedStations($associatedStationLines)
                 $signal = explode(' (', $macAddress[1]);
                 $associatedStations[$mac]['signal'] = $signal[0];
                 $signals = explode('/', $signal[0]);
-                $associatedStations[$mac]['dBmFrom'] = (float)getdBmValue($signals[0]);
-                $associatedStations[$mac]['dBmTo'] = (float)getdBmValue($signals[1]);
+                $dBmFrom = (float) getdBmValue($signals[0]);
+                $associatedStations[$mac]['dBmFrom']  = $dBmFrom;
+                $dBmTo = (float) getdBmValue($signals[1]);
+                $associatedStations[$mac]['dBmTo'] = $dBmTo;
+                $associatedStations[$mac]['dBmSignal'] = getdBmSignal($dBmFrom, $dBmTo);
+
             }
         } elseif (strpos($line, 'RX:')) {
             $rxLine = getRXTXLine($line);
@@ -47,6 +51,7 @@ function getAssociatedStations($associatedStationLines)
             $associatedStations[$mac]['txValue'] = (float)getRxTx($txLine);;
         }
     }
+
     return $associatedStations;
 }
 
@@ -247,9 +252,10 @@ function getUptime($uptimeResult)
         unset($dayValue[0], $dayValue[1]);
         $dayValue = implode('', $dayValue);
     } else {
-        $uptimeResultvalues[1] = explode(' ', $uptimeResultvalues[0])[3];
+        $uptimeResultvalues[1] = explode(' ', ltrim($uptimeResultvalues[0]))[3];
     }
     if (strpos($uptimeResultvalues[1], ':')) {
+
         $hourMinut = explode(':', $uptimeResultvalues[1]);
         $hourMinut[0] .= 'h';
         if (strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
@@ -266,7 +272,6 @@ function getUptime($uptimeResult)
     }
     $uptime = $dayValue . ' ' . $dateValue;
     $uptime .= ' ' . secondsToWords(time());
-
     return $uptime;
 }
 
@@ -280,12 +285,8 @@ function getLocalTime($dateResults)
     return $line;
 }
 
-function getdBmSignal($associatedLines)
+function getdBmSignal($dBmFrom, $dBmTo)
 {
-    foreach ($associatedLines as $macAddress) {
-        $dBmFrom = $macAddress['dBmFrom'];
-        $dBmTo = $macAddress['dBmTo'];
-
         $q = (-1 * ($dBmTo- $dBmFrom) / 5);
         if ($q < 1) {
             $icon = "signal-0";
@@ -298,7 +299,6 @@ function getdBmSignal($associatedLines)
         } else{
             $icon = "signal-75-100";
         }
-    }
 
     return $icon;
 }
@@ -327,4 +327,38 @@ function getQualitySignal($wireless)
     $qualitySignal['icon'] = $icon;
 
     return $qualitySignal;
+}
+
+
+function getFirmwareVersion($firmwareVersion)
+{
+    $firmwareVersion = substr($firmwareVersion[1], 0, strpos($firmwareVersion[1], 'admin@'));
+
+    return $firmwareVersion;
+}
+
+function getModel($model)
+{
+    $model = explode(' ', ltrim($model[1]));
+    $model = explode('-', $model[1])[1];
+
+    return $model;
+}
+
+function getNetWork($network)
+{
+    $networks = [];
+    unset($network[1]);
+
+    foreach ($network as $key => $networkLine) {
+        if (strpos($networkLine, "proto")) {
+            $proto = explode(':', $networkLine);
+            $networks['proto'] = explode('"', $proto[1])[1];
+        } elseif (strpos($networkLine, "ipv4-address")) {
+
+        }
+    }
+
+
+   return $networks;
 }
