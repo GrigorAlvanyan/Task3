@@ -281,7 +281,7 @@ $excludeKeys = [
                     },
                     success: function(result) {
                         // console.log(result);
-                        $("#restart_html").html(result)
+                        // $("#restart_html").html(result)
                     }
                 });
             }
