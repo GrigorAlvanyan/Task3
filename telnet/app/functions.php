@@ -252,7 +252,8 @@ function getUptime($uptimeResult)
         unset($dayValue[0], $dayValue[1]);
         $dayValue = implode('', $dayValue);
     } else {
-        $uptimeResultvalues[1] = explode(' ', ltrim($uptimeResultvalues[0]))[3];
+        $uptimeResultvalues[1] = explode('  ', ltrim($uptimeResultvalues[0]))[1];
+
     }
     if (strpos($uptimeResultvalues[1], ':')) {
 
@@ -348,16 +349,16 @@ function getModel($model)
 function getNetWork($network)
 {
     $networks = [];
-    unset($network[1]);
 
-    foreach ($network as $key => $networkLine) {
-        if (strpos($networkLine, "proto")) {
-            $proto = explode(':', $networkLine);
-            $networks['proto'] = explode('"', $proto[1])[1];
-        } elseif (strpos($networkLine, "ipv4-address")) {
+    $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
+    $networks['Address'] = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
+    $networks['Netmask'] = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
 
-        }
-    }
+    $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
+    $networks['DNS1'] = isset($network['dns-server'][0]) && !empty($network['dns-server'][0]) ? $network['dns-server'][0] : '';
+    $networks['DNS2'] = isset($network['dns-server'][1]) && !empty($network['dns-server'][1]) ? $network['dns-server'][1] : '';
+    $networks['DNS3'] = isset($network['dns-server'][2]) && !empty($network['dns-server'][2]) ? $network['dns-server'][2] : '';
+    $networks['uptime'] = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
 
 
    return $networks;

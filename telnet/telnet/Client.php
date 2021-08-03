@@ -95,13 +95,19 @@ class Client
         }
     }
 
-    public function execute($cmd)
+    public function execute($cmd, $asArray = true)
     {
         $this->connect();
         fwrite($this->connection, $cmd . "\r\n");
         $this->sleep();
         $r = $this->getResponse();
-        return explode(PHP_EOL, $r);
+        if ($asArray) {
+            $result = explode(PHP_EOL, $r);
+        } else {
+            $result = $r;
+        }
+
+        return $result;
     }
 
     private function removeNonPrintableCharacters($str)

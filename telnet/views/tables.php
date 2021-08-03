@@ -44,7 +44,31 @@
         </tr>
         <tr>
             <td></td>
-            <td><strong>Type:</strong><?= $networks['proto'] ?></td>
+            <td><strong>Type:</strong><?= $networks['Type'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>Address:</strong><?= $networks['Address'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>Netmask:</strong><?= $networks['Netmask'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>Gateway:</strong><?= $networks['Gateway'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>DNS 1:</strong><?= $networks['DNS1'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>DNS 2:</strong><?= $networks['DNS2'] ?></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><strong>DNS 3:</strong><?= $networks['DNS3'] ?></td>
         </tr>
     </table>
 <?php endif; ?>

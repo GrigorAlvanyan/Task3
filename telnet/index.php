@@ -30,6 +30,7 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $command = 'ifstatus wan1';
     $network = $client->execute($command);
     $network = linesRemove($network);
+    $network = json_decode(implode('', $network), 1);
     $networks = getNetWork($network);
     $networks = isset($networks) && !empty($networks) ? $networks : [];
 
