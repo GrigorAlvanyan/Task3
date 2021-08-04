@@ -24,18 +24,21 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $su = $telnet->execute('su');
     $su = $telnet->execute($configs['telnet_params']['super_user_password']);
 //    $su=$telnet->execute("ls /");
+//    $command = 'ifstatus wan1';
+//    $network = $telnet->execute($command);
+//    dd($network);
+    $reboot = $telnet->execute( 'reboot');
+echo '111';
 
-
-    $uci = $telnet->execute( 'uci show network.wan1.ifname');
-    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
-    $eth0 = 'luci-bwc -i'.' '.$eth0;
-
-//    $reboot = $client->execute( 'reboot');
-    $uci = $telnet->execute($eth0);
-    dd($uci);
-    die;
+//    $uci = $telnet->execute( 'uci show network.wan1.ifname');
+//    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
+//    $eth0 = 'luci-bwc -i'.' '.$eth0;
+//
+//    $uci = $telnet->execute($eth0);
+//    dd($uci);
+//    die;
 }
-
+echo '111';;
 
 $command = 'iwinfo wlan0 assoclist';
 $cmdResult = $telnet->execute($command);
@@ -71,6 +74,12 @@ $dateResults = linesRemove($dateResult);
 $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
 
+//$command = 'ifstatus wan1';
+//$network = $telnet->execute($command);
+//$network = linesRemove($network);
+//$network = json_decode(implode('', $network), 1);
+//$networks = getNetWork($network);
+//$networks = isset($networks) && !empty($networks) ? $networks : [];
 
 $telnet->disconnect('');
 ?>

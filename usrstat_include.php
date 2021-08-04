@@ -304,7 +304,7 @@ $excludeKeys = [
                         //
                     },
                     success: function(result) {
-                        console.log(123);
+                        $("#telnet_html").html(result);
                         // $("#telnet_html").html(result)
                     }
                 });

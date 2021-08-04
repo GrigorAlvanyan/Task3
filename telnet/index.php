@@ -15,61 +15,73 @@ if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
     die("Invalid IP address");
 }
 
-$telnet = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
-
+$clientOld = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+$clientNew = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
 if (isset($_GET['restart']) && $_GET['restart']) {
-    $client = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+//    $client = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
-    $client->connect();
-    $su = $client->execute('su');
-    $su = $client->execute($configs['telnet_params']['super_user_password']);
-//    $su = $client->execute("ls /");
-//    dd($su);
-
-    $command = 'ifstatus wan1';
-    $network = $client->execute($command);
-    $network = linesRemove($network);
-    $network = json_decode(implode('', $network), 1);
-    $networks = getNetWork($network);
-    $networks = isset($networks) && !empty($networks) ? $networks : [];
+    $clientNew->connect();
+    $su = $clientNew->execute('su');
+    $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
+//
 
 //    $uci = $client->execute( 'uci show network.wan1.ifname');
 //    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
 //    $eth0 = 'luci-bwc -i'.' '.$eth0;
-
-//    $reboot = $client->execute( 'reboot');
+//
+//
 //    $uci = $client->execute($eth0);
 //    $uciLines = linesRemove($uci);
 //    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
+//    $reboot = $clientNew->execute( 'reboot');
 
-
-    $client->disconnect('');
+    $clientNew->disconnect('');
 }
 
 
 if (isset($_GET['traffic']) && $_GET['traffic']) {
 
-    echo '11111111';
+    $clientNew->connect();
+    $su = $clientNew->execute('su');
+    $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
+
+    $uci = $clientNew->execute( 'uci show network.wan1.ifname');
+    $eth0Val = substr($uci[1],strpos($uci[1], 'eth0'));
+    $eth0 = 'luci-bwc -i'.' '.$eth0Val;
+
+
+
+    $uci = $clientNew->execute($eth0);
+    $uciLines = linesRemove($uci);
+    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
+    $k = json_encode($uciLines);
+    echo $k;
+//    dd($uciLines);
+
+
+include ROOT_DIR . '/views/traffic.php';
+
     die;
+
 }
 
 $command = 'iwinfo wlan0 assoclist';
-$cmdResult = $telnet->exec($command);
+$cmdResult = $clientOld->exec($command);
 $cmdResults = linesRemove($cmdResult);
 
 $associatedTable = getAssociatedStations($cmdResults);
 $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
 
 $command = 'iwinfo';
-$iwinfoResult = $telnet->exec($command);
+$iwinfoResult = $clientOld->exec($command);
 $iwinfoResults = linesRemove($iwinfoResult);
 $wireless = getWireless($iwinfoResults);
 $wireless = isset($wireless) && !empty($wireless) ? $wireless : [];
 
 
 $command = 'cat /tmp/dhcp.leases';
-$dhcpResult = $telnet->exec($command);
+$dhcpResult = $clientOld->exec($command);
 $dhcpResults = linesRemove($dhcpResult);
 $dhcpResultArr = getDhcpLeases($dhcpResults);
 $dhcpResultArr = isset($dhcpResultArr) && !empty($dhcpResultArr) ?  $dhcpResultArr : [];
@@ -80,14 +92,14 @@ $nameOfMacAddress = isset($nameOfMacAddress) && !empty($nameOfMacAddress) ? $nam
 
 
 $command = 'uptime';
-$uptimeResult = $telnet->exec($command);
+$uptimeResult = $clientOld->exec($command);
 $uptimeResult = linesRemove($uptimeResult);
 $uptimeResultLine = getUptime($uptimeResult);
 $uptimeResultLine = isset($uptimeResultLine) && !empty($uptimeResultLine) ? $uptimeResultLine : [];
 
 
 $command = 'date';
-$dateResult = $telnet->exec($command);
+$dateResult = $clientOld->exec($command);
 $dateResults = linesRemove($dateResult);
 $localTimeResultLine = getLocalTime($dateResults);
 $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
@@ -97,12 +109,12 @@ $qualitySignal = getQualitySignal($wireless);
 $qualitySignal = isset($qualitySignal) && !empty($qualitySignal) ? $qualitySignal : '';
 
 $command = 'getinfo -fw';
-$firmwareVersion = $telnet->exec($command);
+$firmwareVersion = $clientOld->exec($command);
 $firmwareVersion = getFirmwareVersion($firmwareVersion);
 $firmwareVersion = isset($firmwareVersion) && !empty($firmwareVersion) ? $firmwareVersion : '';
 
 $command = 'cat /tmp/sysinfo/model';
-$model = $telnet->exec($command);
+$model = $clientOld->exec($command);
 $model = linesRemove($model);
 $modelResult = getModel($model);
 $modelResult = isset($modelResult) && !empty($modelResult) ? $modelResult : '';
@@ -110,10 +122,19 @@ $modelResult = isset($modelResult) && !empty($modelResult) ? $modelResult : '';
 //$command = 'getinfo -sn';
 //$model = $telnet->exec($command);
 ////dd($model);die;
+$clientOld->disconnect();
 
 
+$clientNew->connect();
+$su = $clientNew->execute('su');
+$su = $clientNew->execute($configs['telnet_params']['super_user_password']);
 
-$telnet->disconnect();
+$command = 'ifstatus wan1';
+$network = $clientNew->execute($command);
+$network = linesRemove($network);
+$network = json_decode(implode('', $network), 1);
+$networks = getNetWork($network);
+$networks = isset($networks) && !empty($networks) ? $networks : [];
 
 ?>
 

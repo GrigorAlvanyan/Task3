@@ -157,10 +157,11 @@ function getDhcpLeases($dhcpLeasesFileLines)
         foreach ($line as $item) {
 
             if (isValidTimeStamp($item)) {
-
                 $presentTime = time();
                 $presentDate = date('Y-m-d H:i:s', $presentTime);
+                $differenceTime = $item - $presentTime;
                 $timeDifference = $item - $presentTime;
+
                 $timeDifference = $presentTime - $timeDifference;
 
                 $oldDate = date('Y-m-d H:i:s', $timeDifference);
@@ -171,8 +172,11 @@ function getDhcpLeases($dhcpLeasesFileLines)
                 $d1 = new DateTime($assigned_time);
                 $d2 = new DateTime($completed_time);
                 $interval = $d2->diff($d1);
-
-                $dhcpLeases[$key][] = $interval->format(' %hh %im %ss');
+                if($differenceTime > 86400) {
+                    $dhcpLeases[$key][] = $interval->format('%dd %hh %im %ss');
+                } else {
+                    $dhcpLeases[$key][] = $interval->format(' %hh %im %ss');
+                }
 
             } else {
                 $dhcpLeases[$key][] = $item;
@@ -252,8 +256,7 @@ function getUptime($uptimeResult)
         unset($dayValue[0], $dayValue[1]);
         $dayValue = implode('', $dayValue);
     } else {
-        $uptimeResultvalues[1] = explode('  ', ltrim($uptimeResultvalues[0]))[1];
-
+        $uptimeResultvalues[1] = ltrim(substr($uptimeResultvalues[0], (strpos($uptimeResultvalues[0], 'up') + strlen('up '))));
     }
     if (strpos($uptimeResultvalues[1], ':')) {
 
@@ -350,16 +353,45 @@ function getNetWork($network)
 {
     $networks = [];
 
-    $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
-    $networks['Address'] = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
-    $networks['Netmask'] = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
 
+    $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
+    $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
+    $mask = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
+    $networks['Address'] = $address . '/' . $mask;
+    $networks['Netmask'] = isset($network['route'][0]['target']) && !empty($network['route'][0]['target']) ? $network['route'][0]['target'] : '';
     $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
     $networks['DNS1'] = isset($network['dns-server'][0]) && !empty($network['dns-server'][0]) ? $network['dns-server'][0] : '';
     $networks['DNS2'] = isset($network['dns-server'][1]) && !empty($network['dns-server'][1]) ? $network['dns-server'][1] : '';
     $networks['DNS3'] = isset($network['dns-server'][2]) && !empty($network['dns-server'][2]) ? $network['dns-server'][2] : '';
-    $networks['uptime'] = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
 
+    $uptimeTimestamp = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
+
+    $uptime = getTimeConnected($uptimeTimestamp);
+
+    $networks['uptime'] = isset($uptime) && !empty($uptime) ? $uptime : '';
 
    return $networks;
+}
+
+
+
+function getTimeConnected($uptimeTimestamp)
+{
+    $presentTime = time();
+    $presentDate = date('Y-m-d H:i:s', $presentTime);
+    $timeDifference = $presentTime - $uptimeTimestamp;
+    $oldDate = date('Y-m-d H:i:s', $timeDifference);
+    $assigned_time = "{$oldDate}";
+    $completed_time = "{$presentDate}";
+
+    $d1 = new DateTime($assigned_time);
+    $d2 = new DateTime($completed_time);
+    $interval = $d2->diff($d1);
+
+    if($uptimeTimestamp > 86400) {
+        $uptime = $interval->format('%dd %hh %im %ss');
+    } else {
+        $uptime = $interval->format(' %hh %im %ss');
+    }
+    return $uptime;
 }
