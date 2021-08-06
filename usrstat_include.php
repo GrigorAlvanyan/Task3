@@ -269,7 +269,7 @@ $excludeKeys = [
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                url: "<?=getPathTo('/telnet/index.php')?>",
+                url: "<?=getPathTo('/S1/telnet/index.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
@@ -285,7 +285,7 @@ $excludeKeys = [
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/index.php')?>",
+                    url: "<?php echo getPathTo('/S1/telnet/index.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
                         //
@@ -299,7 +299,7 @@ $excludeKeys = [
         })
         $('#Traffic a').click(function() {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/gettraffic.php')?>",
+                    url: "<?php echo getPathTo('/S1/telnet/gettraffic.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "/telnet/getTraffic": true},
                     beforeSend: function () {
                         //
@@ -315,20 +315,6 @@ $excludeKeys = [
 </script>
 
 <div id="telnet_html"></div>
-
-
-
-
-
-
-
-
-
-<?php
-//
-//require_once ROOT_DIR . '/index.php';
-//
-//?>
 
 
 

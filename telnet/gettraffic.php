@@ -16,7 +16,7 @@ $configs = include ROOT_DIR . '/../config.php';
 //    die("Invalid IP address");
 //}
 
-$eoc_ip = '****';
+$eoc_ip = '10.104.62.42';
 
 $clientNew = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 

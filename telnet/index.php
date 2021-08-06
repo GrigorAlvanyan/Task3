@@ -25,18 +25,6 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $su = $clientNew->execute('su');
     $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
 //
-
-//    $uci = $clientNew->execute( 'uci show network.wan1.ifname');
-//    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
-//    $eth0 = 'luci-bwc -i'.' '.$eth0;
-////
-////
-//    $uci = $clientNew->execute($eth0);
-//    $uciLines = linesRemove($uci);
-//    $uci = json_encode($uciLines);
-//    dd($uci);die;
-
-//    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
 //    $reboot = $clientNew->execute( 'reboot');
 //     die;
     $clientNew->disconnect('');
