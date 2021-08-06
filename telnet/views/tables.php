@@ -36,61 +36,75 @@
 <?php if(!empty($networks)) : ?>
     <table class="table_1">
         <tr>
-            <th colspan=2><b>Network</b></th>
+            <th colspan=3><b>Network</b></th>
         </tr>
         <tr>
             <td>IPv4 WAN Status</td>
-            <td>Service WAN</td>
+            <td style='padding:0;width:15px;text-align: center;'><img width=16 src="img/network.png"></td>
+            <td><strong>Service WAN</strong></td>
         </tr>
-        <tr>
-            <td></td>
-            <td><strong>Type: </strong><?= $networks['Type'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>Address: </strong><?= $networks['Address'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>Netmask: </strong><?= $networks['Netmask'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>Gateway: </strong><?= $networks['Gateway'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>DNS 1: </strong><?= $networks['DNS1'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>DNS 2: </strong><?= $networks['DNS2'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>DNS 3: </strong><?= $networks['DNS3'] ?></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><strong>Connected: </strong><?= $networks['uptime'] ?></td>
-        </tr>
+        <?php if(!empty($networks['Type'])) :?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Type: </strong><?= $networks['Type'] ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if(!empty($networks['Type'])) :?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Address: </strong><?= $networks['Address'] ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if(!empty($networks['Type'])) :?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Netmask: </strong><?= $networks['Netmask'] ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if(!empty($networks['Type'])) :?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Gateway: </strong><?= $networks['Gateway'] ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php if(isset($networks['DNS']) &&  !empty($networks['DNS'])) : ?>
+            <?php foreach ($networks['DNS'] as $key => $dns) : ?>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td><strong><?= $key ?></strong><?= $dns ?></td>
+                </tr>
+            <?php endforeach ?>
+        <?php endif; ?>
+        <?php if(!empty($networks['Type'])) :?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><strong>Connected: </strong><?= $networks['uptime'] ?></td>
+            </tr>
+        <?php endif; ?>
     </table>
 <?php endif; ?>
 
 
 
-<?php if(!empty($dhcpResultArr)) : ?>
 
-    <table class="table_1">
-        <tr>
-            <th colspan=4><b>DHCP Leases</b></th>
-        </tr>
-        <tr>
-            <th><b>Hostname</b></th>
-            <th><b>IPv4-Address</b></th>
-            <th><b>MAC-Address</b></th>
-            <th><b>Leasetime remaining</b></th>
-        </tr>
+
+<table class="table_1">
+    <tr>
+        <th colspan=4><b>DHCP Leases</b></th>
+    </tr>
+    <tr>
+        <th><b>Hostname</b></th>
+        <th><b>IPv4-Address</b></th>
+        <th><b>MAC-Address</b></th>
+        <th><b>Leasetime remaining</b></th>
+    </tr>
+    <?php if(!empty($dhcpResultArr)) : ?>
         <?php foreach ($dhcpResultArr as $dhcpResult) : ?>
             <tr>
                 <?php foreach ($dhcpResult as $res) : ?>
@@ -98,8 +112,13 @@
                 <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
-    </table>
-<?php endif; ?>
+    <?php else:?>
+        <tr>
+            <td><em>There are no active leases.</em></td>
+        </tr>
+    <?php endif; ?>
+</table>
+
 
 
 <?php if(!empty($wireless)) : ?>
@@ -131,34 +150,46 @@
 <?php endif; ?>
 
 
-<?php if(!empty($nameOfMacAddress)) : ?>
-        <table class="table_1">
-            <tr>
-                <th colspan=6><b>Associated Stations</b></th>
-            </tr>
-            <tr>
-                <th style="width:20px"></th>
-                <th><b>Hostname</b></th>
-                <th><b>Brand</b></th>
-                <th><b>MAC-Address</b></th>
-                <th><b>RX Rate</b></th>
-                <th><b>TX Rate</b></th>
-            </tr>
-            <?php foreach ($nameOfMacAddress as $res) : ?>
 
-                <tr>
-                    <td style='padding:0;width:15px;text-align: center'>
-                        <img width=16 src='img/<?=$res['dBmSignal']?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
-                    </td>
-                    <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
-                    <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
-                    <td><?php echo $res['mac'];?> </td>
-                    <td><?php echo $res['rx']; ?></td>
-                    <td><?php echo $res['tx']; ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+
+<table class="table_1">
+    <?php if(!empty($nameOfMacAddress)) : ?>
+    <tr>
+        <th colspan=6><b>Associated Stations</b></th>
+    </tr>
+    <tr>
+        <th style="width:20px"></th>
+        <th><b>Hostname</b></th>
+        <th><b>Brand</b></th>
+        <th><b>MAC-Address</b></th>
+        <th><b>RX Rate</b></th>
+        <th><b>TX Rate</b></th>
+    </tr>
+        <?php foreach ($nameOfMacAddress as $res) : ?>
+            <tr>
+                <td style='padding:0;width:15px;text-align: center'>
+                    <img width=16 src='img/<?=$res['dBmSignal']?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
+                </td>
+                <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
+                <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
+                <td><?php echo $res['mac'];?> </td>
+                <td><?php echo $res['rx']; ?></td>
+                <td><?php echo $res['tx']; ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <th colspan=5><b>Associated Stations</b></th>
+        </tr>
+        <tr>
+            <th><b>Hostname</b></th>
+            <th><b>Brand</b></th>
+            <th><b>MAC-Address</b></th>
+            <th><b>RX Rate</b></th>
+            <th><b>TX Rate</b></th>
+        </tr>
+        <tr>
+            <td><em>No information available</em></td>
+        </tr>
     <?php endif; ?>
-
-
-
+</table>

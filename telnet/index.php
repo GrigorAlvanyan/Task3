@@ -26,45 +26,46 @@ if (isset($_GET['restart']) && $_GET['restart']) {
     $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
 //
 
-//    $uci = $client->execute( 'uci show network.wan1.ifname');
+//    $uci = $clientNew->execute( 'uci show network.wan1.ifname');
 //    $eth0 = substr($uci[1],strpos($uci[1], 'eth0'));
 //    $eth0 = 'luci-bwc -i'.' '.$eth0;
-//
-//
-//    $uci = $client->execute($eth0);
+////
+////
+//    $uci = $clientNew->execute($eth0);
 //    $uciLines = linesRemove($uci);
+//    $uci = json_encode($uciLines);
+//    dd($uci);die;
+
 //    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
 //    $reboot = $clientNew->execute( 'reboot');
-
+//     die;
     $clientNew->disconnect('');
 }
 
-
-if (isset($_GET['traffic']) && $_GET['traffic']) {
-
-    $clientNew->connect();
-    $su = $clientNew->execute('su');
-    $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
-
-    $uci = $clientNew->execute( 'uci show network.wan1.ifname');
-    $eth0Val = substr($uci[1],strpos($uci[1], 'eth0'));
-    $eth0 = 'luci-bwc -i'.' '.$eth0Val;
-
-
-
-    $uci = $clientNew->execute($eth0);
-    $uciLines = linesRemove($uci);
-    $uciLines = isset($uciLines) && !empty($uciLines) ? $uciLines : [];
-    $k = json_encode($uciLines);
-    echo $k;
-//    dd($uciLines);
-
-
-include ROOT_DIR . '/views/traffic.php';
-
-    die;
-
-}
+//
+//if (isset($_GET['getTraffic']) && $_GET['getTraffic']) {
+//
+//
+//    $clientNew->connect();
+//    $su = $clientNew->execute('su');
+//    $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
+//
+//    $uci = $clientNew->execute('uci show network.wan1.ifname');
+//    $eth0Val = substr($uci[1], strpos($uci[1], 'eth0'));
+//    $eth0 = 'luci-bwc -i' . ' ' . $eth0Val;
+//
+//
+//    $uci = $clientNew->execute($eth0);
+//    $uciLines = linesRemove($uci);
+//    $uci = isset($uci) && !empty($uci) ? $uci : [];
+//    $k = $uciLines;
+//    $k = json_encode(array_values($uciLines));
+//    $k = str_replace('"', '', $k);
+//    $k = str_replace(',,', ',', $k);
+//
+//    echo $k;
+//
+//}
 
 $command = 'iwinfo wlan0 assoclist';
 $cmdResult = $clientOld->exec($command);
@@ -124,7 +125,7 @@ $modelResult = isset($modelResult) && !empty($modelResult) ? $modelResult : '';
 ////dd($model);die;
 $clientOld->disconnect();
 
-
+//
 $clientNew->connect();
 $su = $clientNew->execute('su');
 $su = $clientNew->execute($configs['telnet_params']['super_user_password']);

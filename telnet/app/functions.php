@@ -348,11 +348,10 @@ function getModel($model)
 
     return $model;
 }
-
+//todo need optimization
 function getNetWork($network)
 {
     $networks = [];
-
 
     $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
     $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
@@ -360,10 +359,13 @@ function getNetWork($network)
     $networks['Address'] = $address . '/' . $mask;
     $networks['Netmask'] = isset($network['route'][0]['target']) && !empty($network['route'][0]['target']) ? $network['route'][0]['target'] : '';
     $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
-    $networks['DNS1'] = isset($network['dns-server'][0]) && !empty($network['dns-server'][0]) ? $network['dns-server'][0] : '';
-    $networks['DNS2'] = isset($network['dns-server'][1]) && !empty($network['dns-server'][1]) ? $network['dns-server'][1] : '';
-    $networks['DNS3'] = isset($network['dns-server'][2]) && !empty($network['dns-server'][2]) ? $network['dns-server'][2] : '';
-
+    if(isset($network['dns-server']) && !empty($network['dns-server'])){
+        $j = 1;
+        for ($i = 0; $i < count($network['dns-server']); $i++) {
+            $networks['DNS']["DNS {$j}: "] =  $network['dns-server'][$i];
+            $j++;
+        }
+    }
     $uptimeTimestamp = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
 
     $uptime = getTimeConnected($uptimeTimestamp);

@@ -95,6 +95,7 @@ $excludeKeys = [
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="http://10.104.62.42/luci-static/resources/xhr.js"></script>
 <table class='table_1'>
     <tr>
         <th colspan=2><b>Узел</b></th>
@@ -298,8 +299,8 @@ $excludeKeys = [
         })
         $('#Traffic a').click(function() {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/index.php')?>",
-                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic": true},
+                    url: "<?php echo getPathTo('/telnet/gettraffic.php')?>",
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "/telnet/getTraffic": true},
                     beforeSend: function () {
                         //
                     },
@@ -313,9 +314,26 @@ $excludeKeys = [
 
 </script>
 
-
 <div id="telnet_html"></div>
 
 
 
 
+
+
+
+
+
+<?php
+//
+//require_once ROOT_DIR . '/index.php';
+//
+//?>
+
+
+
+<?php
+
+require_once ROOT_DIR . '\telnet\views\traffic.php';
+
+?>
