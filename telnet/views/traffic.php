@@ -4,7 +4,7 @@ define('ROOT_DIR', __DIR__);
 require_once ROOT_DIR . '/../../helpers.php';
 require_once ROOT_DIR . '/../app/functions.php';
 $configs = include ROOT_DIR . '/../../config.php';
-$invalidIp = $configs['error_mess   ages']['invalid_ip_address'];
+$invalidIp = $configs['error_messages']['invalid_ip_address'];
 
 $eoc_ip = $_GET['eoc_ip'];
 $svg = $_GET['svg'];

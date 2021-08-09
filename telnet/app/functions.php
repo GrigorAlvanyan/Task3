@@ -293,18 +293,18 @@ function getdBmSignal($dBmFrom, $dBmTo)
 {
         $q = (-1 * ($dBmTo- $dBmFrom) / 5);
         if ($q < 1) {
-            $icon = "signal-0";
+            $class = "signal-0";
         } else if ($q < 2) {
-            $icon = "signal-0-25";
+            $class = "signal-0-25";
         } else if ($q < 3){
-            $icon = "signal-25-50";
+            $class = "signal-25-50";
         } else if ($q < 4){
-            $icon = "signal-50-75";
+            $class = "signal-50-75";
         } else{
-            $icon = "signal-75-100";
+            $class = "signal-75-100";
         }
 
-    return $icon;
+    return $class;
 }
 
 function getQualitySignal($wireless)
@@ -316,19 +316,19 @@ function getQualitySignal($wireless)
     $result = (int) (($qualityMin * 100) / $qualityMax);
 
     if($result > 0 && $result <= 25) {
-        $icon = "signal-0-25";
+        $class = "signal-0-25";
     } elseif ($result > 25 && $result <= 50) {
-        $icon = "signal-25-50";
+        $class = "signal-25-50";
     } elseif ($result > 50 && $result <= 75) {
-        $icon = "signal-50-75";
+        $class = "signal-50-75";
     } elseif ($result > 75 && $result <= 100) {
-        $icon = "signal-75-100";
+        $class = "signal-75-100";
     } elseif ($result == 0) {
-        $icon = "signal-0";
+        $class = "signal-0";
     }
     $result .= '%';
     $qualitySignal['result'] = $result;
-    $qualitySignal['icon'] = $icon;
+    $qualitySignal['icon'] = $class;
 
     return $qualitySignal;
 }

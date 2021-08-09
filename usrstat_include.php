@@ -95,6 +95,7 @@ $excludeKeys = [
 ?>
 <script src="http://<?= $eoc_ip; ?>/luci-static/resources/xhr.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="css/staticStyle.css" type="text/css"/>
 
 <table class='table_1'>
     <tr>

@@ -144,7 +144,13 @@
         <th colspan=2><b>WLAN</b></th>
             <tr>
                 <?php if(!empty($qualitySignal)) : ?>
-                    <td style='padding:0;width:15px;text-align: center;'><img width=16 src="img/<?= $qualitySignal['icon']?>.png"></td>
+                <td style='padding:0;width:15px;text-align: center'>
+                    <div class="signal <?=$qualitySignal['icon'];?>">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 <?php endif; ?>
                 <td><strong>SSID:</strong><?php echo isset($wireless['SSID']) ? $wireless['SSID'] : ''?></td>
             </tr>
@@ -186,7 +192,13 @@
         <?php foreach ($nameOfMacAddress as $res) : ?>
             <tr>
                 <td style='padding:0;width:15px;text-align: center'>
-                    <img width=16 src='img/<?=$res['dBmSignal']?>.png' title='<?php echo $res['signal']; ?>' alt='<?php echo $res['signal']; ?>'>
+                    <div class="signal <?=$res['dBmSignal'];?>">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+<!--                    <img width=16 src='img/--><?//=$res['dBmSignal']?><!--.png' title='--><?php //echo $res['signal']; ?><!--' alt='--><?php //echo $res['signal']; ?><!--'>-->
                 </td>
                 <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
                 <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>
