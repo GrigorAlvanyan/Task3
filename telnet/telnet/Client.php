@@ -52,7 +52,7 @@ class Client
 
             $errorNumber = 0;
 
-            if ($this->connection = fsockopen($this->server, $this->port, $errno, $errstr, 5)) {
+            if ($this->connection = fsockopen($this->server, $this->port, $errno, $errstr, 10)) {
 
                 if ($this->username !== null || $this->password !== null) {
 

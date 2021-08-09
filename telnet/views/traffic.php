@@ -1,10 +1,12 @@
 <?php
 
-//require_once ROOT_DIR . '/index.php';
+$eoc_ip = $_GET['eoc_ip'];
+$svg = $_GET['svg'];
 
 ?>
 
-
+<!--<script src="http://--><?//= $eoc_ip; ?><!--/luci-static/resources/xhr.js"></script>-->
+<!--<script src="xhr.js"></script>-->
 
 <script type="text/javascript">
     // <![CDATA[
@@ -152,13 +154,11 @@
 
 
                 /* render datasets, start update interval */
-
-                // http://10.104.62.42/cgi-bin/luci/;stok=69291ee189f1f7c441f0ab16709b1313/admin/status/realtime
-                // XHR.poll(3, '/cgi-bin/luci/;stok=105c5e205df94c7dfaa1db4590662bc0/admin/status/realtime/bandwidth_status/eth0.491', null,
-                //    XHR.poll(3, 'http://<?//=$eoc_ip?>///cgi-bin/luci/;stok=69291ee189f1f7c441f0ab16709b1313/admin/status/realtime', null,
-                XHR.poll(3, "<?php echo getPathTo('/telnet/gettraffic.php')?>", null,
+                XHR.poll(3, "<?= $_GET['traffic_url'] ?>", {"eoc_ip":"<?= $_GET['eoc_ip'] ?>"},
                     function(data, x)
                     {
+
+                        console.log(data);
                         // data = JSON.parse(data);
                         // data = data.str.replace(/[\u0000-\u0019]+/g,"");
                         console.log(data)
@@ -274,4 +274,4 @@
 
 
 
-<embed id="bwsvg" style="width:100%; height:300px; border:1px solid #000000; background-color:#FFFFFF" src="<?=getPathTo('/telnet/bandwidth.svg')?>" />
+<embed id="bwsvg" style="width:100%; height:300px; border:1px solid #000000; background-color:#FFFFFF" src="<?=$svg?>" />

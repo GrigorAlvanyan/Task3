@@ -93,9 +93,9 @@ $excludeKeys = [
 ];
 
 ?>
-
+<script src="http://<?= $eoc_ip; ?>/luci-static/resources/xhr.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="http://10.104.62.42/luci-static/resources/xhr.js"></script>
+
 <table class='table_1'>
     <tr>
         <th colspan=2><b>Узел</b></th>
@@ -269,7 +269,7 @@ $excludeKeys = [
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                url: "<?=getPathTo('/S1/telnet/index.php')?>",
+                url: "<?=getPathTo('/telnet/index.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
@@ -285,7 +285,7 @@ $excludeKeys = [
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
-                    url: "<?php echo getPathTo('/S1/telnet/index.php')?>",
+                    url: "<?php echo getPathTo('/telnet/index.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
                         //
@@ -299,8 +299,9 @@ $excludeKeys = [
         })
         $('#Traffic a').click(function() {
                 $.ajax({
-                    url: "<?php echo getPathTo('/S1/telnet/gettraffic.php')?>",
-                    data: {"eoc_ip": "<?=$eoc_ip?>", "/telnet/getTraffic": true},
+                    url: "<?php echo getPathTo('/telnet/views/traffic.php')?>",
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('/telnet/gettraffic.php')?>",
+                        "svg": "<?=getPathTo('/telnet/bandwidth.svg')?>"},
                     beforeSend: function () {
                         //
                     },
@@ -317,9 +318,6 @@ $excludeKeys = [
 <div id="telnet_html"></div>
 
 
-
 <?php
 
-require_once ROOT_DIR . '\telnet\views\traffic.php';
-
-?>
+//require_once ROOT_DIR . '/telnet/views/traffic.php';

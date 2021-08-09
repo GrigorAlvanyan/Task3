@@ -351,13 +351,14 @@ function getModel($model)
 //todo need optimization
 function getNetWork($network)
 {
+//    dd($network);die;
     $networks = [];
 
     $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
     $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
     $mask = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
     $networks['Address'] = $address . '/' . $mask;
-    $networks['Netmask'] = isset($network['route'][0]['target']) && !empty($network['route'][0]['target']) ? $network['route'][0]['target'] : '';
+
     $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
     if(isset($network['dns-server']) && !empty($network['dns-server'])){
         $j = 1;
@@ -372,9 +373,24 @@ function getNetWork($network)
 
     $networks['uptime'] = isset($uptime) && !empty($uptime) ? $uptime : '';
 
+    $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
+
    return $networks;
 }
 
+
+
+function cidr2NetmaskAddr ($cidr) {
+
+    $ta = substr ($cidr, strpos ($cidr, '/') + 1) * 1;
+    $netmask = str_split (str_pad (str_pad ('', $ta, '1'), 32, '0'), 8);
+
+    foreach ($netmask as &$element)
+        $element = bindec ($element);
+
+    return join ('.', $netmask);
+
+}
 
 
 function getTimeConnected($uptimeTimestamp)
