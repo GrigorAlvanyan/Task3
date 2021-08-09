@@ -8,17 +8,9 @@ require_once ROOT_DIR . '/app/functions.php';
 $configs = include ROOT_DIR . '/../config.php';
 
 
-if(isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip'])) {
-    $eoc_ip = $_GET['eoc_ip'];
-} else {
-    die("Invalid IP address");
-}
-
-
+$eoc_ip = isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip']) ? $_GET['eoc_ip'] : '' ;
 
 $clientNew = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
-
-
 
 
 
@@ -40,6 +32,5 @@ $k = json_encode(array_values($uciLines));
 $k = str_replace('"', '', $k);
 $k = str_replace(',,', ',', $k);
 
-//dd($k);
 
 echo $k;

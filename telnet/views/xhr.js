@@ -5,6 +5,8 @@
 
 XHR = function()
 {
+
+
     this.reinit = function()
     {
         if (window.XMLHttpRequest) {
@@ -55,7 +57,6 @@ XHR = function()
                 url += '?' + code;
 
         xhr.open('GET', url, true);
-
         xhr.onreadystatechange = function()
         {
             if (xhr.readyState == 4) {
@@ -68,7 +69,6 @@ XHR = function()
                         json = null;
                     }
                 }
-
                 callback(xhr, json);
             }
         }
@@ -173,7 +173,6 @@ XHR.get = function(url, data, callback)
 
 XHR.poll = function(interval, url, data, callback)
 {
-    console.log(data)
     if (isNaN(interval) || interval < 1)
         interval = 5;
 
@@ -185,7 +184,6 @@ XHR.poll = function(interval, url, data, callback)
             for (var i = 0, e = XHR._q[0]; i < XHR._q.length; e = XHR._q[++i])
             {
                 if (!(XHR._t % e.interval) && !e.xhr.busy()) {
-                    // console.log(e.callback)
                     e.xhr.get(e.url, e.data, e.callback);
                 }
             }

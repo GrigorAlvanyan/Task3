@@ -334,9 +334,10 @@ function getQualitySignal($wireless)
 }
 
 
-function getFirmwareVersion($firmwareVersion)
+function getFirmwareVersion($firmwareVersion, $telnetUsername)
 {
-    $firmwareVersion = substr($firmwareVersion[1], 0, strpos($firmwareVersion[1], 'admin@'));
+    $telnetUsername = $telnetUsername . '@';
+    $firmwareVersion = substr($firmwareVersion[1], 0, strpos($firmwareVersion[1], "$telnetUsername"));
 
     return $firmwareVersion;
 }
@@ -357,7 +358,11 @@ function getNetWork($network)
     $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
     $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
     $mask = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
-    $networks['Address'] = $address . '/' . $mask;
+    if(!empty($address) && !empty($mask)){
+        $networks['Address'] = $address . '/' . $mask;
+        $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
+    }
+//    $networks['Address'] = $address . '/' . $mask;
 
     $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
     if(isset($network['dns-server']) && !empty($network['dns-server'])){
@@ -368,19 +373,22 @@ function getNetWork($network)
         }
     }
     $uptimeTimestamp = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
+    if (!empty($uptimeTimestamp)) {
+        $uptime = getTimeConnected($uptimeTimestamp);
+        $networks['uptime'] = $uptime;
+    }
 
-    $uptime = getTimeConnected($uptimeTimestamp);
+//    $networks['uptime'] = isset($uptime) && !empty($uptime) ? $uptime : '';
 
-    $networks['uptime'] = isset($uptime) && !empty($uptime) ? $uptime : '';
 
-    $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
 
    return $networks;
 }
 
 
 
-function cidr2NetmaskAddr ($cidr) {
+function cidr2NetmaskAddr ($cidr)
+{
 
     $ta = substr ($cidr, strpos ($cidr, '/') + 1) * 1;
     $netmask = str_split (str_pad (str_pad ('', $ta, '1'), 32, '0'), 8);
@@ -412,4 +420,38 @@ function getTimeConnected($uptimeTimestamp)
         $uptime = $interval->format(' %hh %im %ss');
     }
     return $uptime;
+}
+
+
+function validateIp($ip)
+{
+    if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+        return false;
+    }
+    return true;
+
+}
+
+function getHardwareVersion($hardware, $superUserLogin)
+{
+    $superUserLogin = $superUserLogin . '@';
+    $hardware = substr($hardware[1], 0, strpos($hardware[1], "{$superUserLogin}"));
+
+    return $hardware;
+}
+
+function getSoftwareVersion($software, $superUserLogin)
+{
+    $superUserLogin = $superUserLogin . '@';
+    $software = substr($software[1], 0, strpos($software[1], "{$superUserLogin}"));
+
+    return $software;
+}
+
+function getserialNumber($serial, $superUserLogin)
+{
+    $superUserLogin = $superUserLogin . '@';
+    $serial = substr($serial[1], 0, strpos($serial[1], "{$superUserLogin}"));
+
+    return $serial;
 }

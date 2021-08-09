@@ -4,8 +4,10 @@ namespace PhpTelnet;
 class Client
 {
 
-    var $uSleepTime = 150000; //default 1250000 //oindex = 800000
+    var $uSleepTime = 200000; //default 1250000 //oindex = 800000
     var $sleepTime = 1000000; //default 1250000 // oindex = 800000
+
+    var $socketOpenTimeout = 10;
 
     var $loginSleepTime = 1000000;
 
@@ -33,6 +35,7 @@ class Client
 
     const ERROR_3 = "login failed";
 
+
     public function __construct($server, $port, $username = null, $password = null)
     {
         // we need php 5 obviously
@@ -51,8 +54,7 @@ class Client
         if ($this->connection === NULL) {
 
             $errorNumber = 0;
-
-            if ($this->connection = fsockopen($this->server, $this->port, $errno, $errstr, 10)) {
+            if ($this->connection = fsockopen($this->server, $this->port, $errno, $errstr, $this->socketOpenTimeout)) {
 
                 if ($this->username !== null || $this->password !== null) {
 
@@ -60,8 +62,10 @@ class Client
                     $r = explode("\n", $r);
                     $this->loginPrompt = $r[count($r) - 1];
 
+
                     fputs($this->connection, $this->username . "\r");
                     $this->sleep();
+
 
                     fputs($this->connection, $this->password . "\r");
                     $this->sleep($this->loginSleepTime);

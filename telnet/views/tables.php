@@ -10,10 +10,28 @@
             <td><?= $modelResult ?></td>
         </tr>
     <?php endif; ?>
+    <?php if(!empty($hardwareVersion)) :?>
+        <tr>
+            <td class='even_th' width="250px">Hardware Version</td>
+            <td><?= $hardwareVersion ?></td>
+        </tr>
+    <?php endif; ?>
     <?php if(!empty($firmwareVersion)) :?>
         <tr>
             <td class='even_th' width="250px">Firmware Version</td>
             <td><?= $firmwareVersion ?></td>
+        </tr>
+    <?php endif; ?>
+    <?php if(!empty($softwareVersion)) :?>
+        <tr>
+            <td class='even_th' width="250px">Software Version</td>
+            <td><?= $softwareVersion ?></td>
+        </tr>
+    <?php endif; ?>
+    <?php if(!empty($serialNumber)) :?>
+        <tr>
+            <td class='even_th' width="250px">Serial Number</td>
+            <td><?= $serialNumber ?></td>
         </tr>
     <?php endif; ?>
     <?php if(!empty($localTimeResultLine)) :?>

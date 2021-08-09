@@ -15,7 +15,8 @@ return [
         'status' => 'Result status not found, line:',
         'items' => 'Result items not found, line:',
         'table' => ' table not found, line:',
-        'values' => 'Result values not found, line:'
+        'values' => 'Result values not found, line:',
+        'invalid_ip_address' => 'Invalid IP address'
     ],
     'db_params' => [
         'host' => 'localhost',//10.1.1.41
@@ -378,6 +379,7 @@ return [
         'port' => 111,
         'username' => '***',
         'password' => '***',
+        'super_user_login' => '***',
         'super_user_password' => '***'
     ]
 
