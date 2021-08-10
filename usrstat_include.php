@@ -257,14 +257,20 @@ $excludeKeys = [
             </div>
         </td>
         <td>
-            <div id="restartRouter" style="display: none">
+            <div id="speedtest" style="margin-right: 30px">
+                <a href="javascript:void(0)">
+                    <img src="img/speed_test.png" alt="" style="width: 35px; height: 35px;">
+                </a>
+            </div>
+        </td>
+        <td>
+            <div id="restartRouter" >
                 <a href="javascript:void(0)">
                     <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
                 </a>
             </div>
         </td>
-
-    </tr>
+            </tr>
 </table>
 
 <script>
@@ -279,7 +285,7 @@ $excludeKeys = [
                 success: function(result) {
                     $('.preloader').css('display', 'none')
                     $("#telnet_html").html(result);
-                    $('#restartRouter').css('display', 'block')
+                    // $('#restartRouter').css('display', 'block')
                 }
             });
         });
@@ -311,6 +317,18 @@ $excludeKeys = [
                         $("#telnet_html").html(result);
                     }
                 });
+        })
+        $('#speedtest a').click(function() {
+            $.ajax({
+                url: "<?php echo getPathTo('/telnet/get_speed_test.php')?>",
+                data: {"eoc_ip": "<?=$eoc_ip?>"},
+                beforeSend: function () {
+                    //
+                },
+                success: function(result) {
+                    $("#telnet_html").html(result);
+                }
+            });
         })
     });
 

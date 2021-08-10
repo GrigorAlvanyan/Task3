@@ -344,11 +344,24 @@ function getFirmwareVersion($firmwareVersion, $telnetUsername)
 
 function getModel($model)
 {
-    $model = explode(' ', ltrim($model[1]));
-    $model = explode('-', $model[1])[1];
+
+
+    if (!isset($model[1])) {
+        return null;
+    } else {
+        $model = explode(' ', ltrim($model[1]));
+        if (!isset($model[1])) {
+            echo '22';
+            return null;
+        } else {
+            $model = explode('-', $model[1]);
+        }
+    }
+    $model = isset($model[1]) && !empty($model[1]) ? $model[1] : '';
 
     return $model;
 }
+
 //todo need optimization
 function getNetWork($network)
 {

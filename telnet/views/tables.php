@@ -191,14 +191,13 @@
     </tr>
         <?php foreach ($nameOfMacAddress as $res) : ?>
             <tr>
-                <td style='padding:0;width:15px;text-align: center'>
-                    <div class="signal <?=$res['dBmSignal'];?>">
+                <td style='padding:0;width:15px;'>
+                    <div class="signal <?=$res['dBmSignal'];?>" align="right">
                         <span></span>
                         <span></span>
                         <span></span>
                         <span></span>
                     </div>
-<!--                    <img width=16 src='img/--><?//=$res['dBmSignal']?><!--.png' title='--><?php //echo $res['signal']; ?><!--' alt='--><?php //echo $res['signal']; ?><!--'>-->
                 </td>
                 <td><?php echo isset($res['hostName']) ? $res['hostName'] : ''?></td>
                 <td><?php echo isset($res['brand']) ? $res['brand'] : ''?></td>

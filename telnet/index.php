@@ -117,6 +117,8 @@ if ($ip === true) {
 
     }
 
+    if(isset($_GET['speedtest']))
+
     include ROOT_DIR . '/views/tables.php';
 
 } else {
