@@ -273,6 +273,25 @@ $excludeKeys = [
             </tr>
 </table>
 
+<div class="countdown"></div>
+
+
+<style>
+
+    .countdown {
+        display: none;
+        width: 100px;
+        height: 50px;
+        background-color: #ebc85d;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 50px;
+        text-align: center;
+        border-radius: 5px;
+    }
+</style>
+
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
@@ -296,9 +315,24 @@ $excludeKeys = [
                     url: "<?php echo getPathTo('/telnet/index.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
-                        //
+                        $("#telnet_html").empty();
+                        $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
+                        $('.countdown').css('display', 'block')
+                        var countdown = 40;
+                        setInterval(function() {
+                            countdown--;
+                            var view = '00:' + countdown;
+                            if (countdown < 10) {
+                                view = '00:0' + countdown
+                            }
+                            if (countdown >= 0) {
+                                $('.countdown').html(view)
+                            }
+                        }, 1000)
                     },
                     success: function(result) {
+                        $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                        $('.countdown').css('display', 'none')
                         // console.log(result);
                         $("#telnet_html").html(result)
                     }

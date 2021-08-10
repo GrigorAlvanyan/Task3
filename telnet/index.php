@@ -113,11 +113,14 @@ if ($ip === true) {
 
     if (isset($_GET['restart']) && $_GET['restart']) {
 
-        $reboot = $clientNew->execute( 'reboot');
+        sleep(40);
+//        $reboot = $clientNew->execute( 'reboot');
+
+        echo 'rebooted';
 
     }
 
-    if(isset($_GET['speedtest']))
+
 
     include ROOT_DIR . '/views/tables.php';
 
