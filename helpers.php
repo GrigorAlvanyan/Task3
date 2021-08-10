@@ -1,5 +1,12 @@
 <?php
 
+function dd($res)
+{
+    echo '<pre>';
+    print_r($res);
+    echo '</pre>';
+}
+
 function getConfigs()
 {
     $configs = include 'config.php';
@@ -24,6 +31,7 @@ function serverUri($withQueryParams = true)
     if (!$withQueryParams) {
         $uri = substr($uri, 0, strpos($uri, '?'));
     }
+
     return $uri;
 }
 
@@ -36,12 +44,10 @@ function getPathTo($path)
 
     $path = $uri . '/' . $path;
 
+    if (!isLocal()){
+        $path = '/S1' . $path;
+    }
+
     return $path;
 }
 
-function dd($res)
-{
-    echo '<pre>';
-    print_r($res);
-    echo '</pre>';
-}

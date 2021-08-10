@@ -5,11 +5,11 @@ class Client
 {
 
     var $uSleepTime = 200000; //default 1250000 //oindex = 800000
-    var $sleepTime = 1250000; //default 1250000 // oindex = 800000
+    var $sleepTime = 800000; //default 1250000 // oindex = 800000
 
-    var $socketOpenTimeout = 12.5;
+    var $socketOpenTimeout = 8;
 
-    var $loginSleepTime = 1250000;
+    var $loginSleepTime = 800000;
 
     var $connection = null;
 

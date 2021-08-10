@@ -33,6 +33,7 @@ if (isset($_GET['name']) && !empty($_GET['name'])) {
     $nodeName = $personalinfo[2];
 }
 
+
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
 if (isset($results['error'])) {
     echo $results['error'];
@@ -75,6 +76,7 @@ if (!empty($objectProp)) {
 } else {
     $objectProp =  'not found';
 }
+echo getPathTo('/telnet/views/traffic.php');die;
 
 $connection->close();
 
@@ -308,7 +310,6 @@ $excludeKeys = [
                     },
                     success: function(result) {
                         $("#telnet_html").html(result);
-                        // $("#telnet_html").html(result)
                     }
                 });
         })
@@ -319,6 +320,5 @@ $excludeKeys = [
 <div id="telnet_html"></div>
 
 
-<?php
 
 

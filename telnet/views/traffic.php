@@ -1,5 +1,7 @@
 <?php
+
 define('ROOT_DIR', __DIR__);
+
 
 require_once ROOT_DIR . '/../../helpers.php';
 require_once ROOT_DIR . '/../app/functions.php';
@@ -13,8 +15,7 @@ $ip = validateIp($eoc_ip);
 
 ?>
 
-<!--<script src="http://--><?//= $eoc_ip; ?><!--/luci-static/resources/xhr.js"></script>-->
-<!--<script src="xhr.js"></script>-->
+
 <?php if($ip === true) : ?>
     <script type="text/javascript">
         // <![CDATA[
