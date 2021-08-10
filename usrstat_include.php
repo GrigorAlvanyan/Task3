@@ -76,7 +76,6 @@ if (!empty($objectProp)) {
 } else {
     $objectProp =  'not found';
 }
-echo getPathTo('/telnet/views/traffic.php');die;
 
 $connection->close();
 
