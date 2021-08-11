@@ -145,7 +145,7 @@
             <tr>
                 <?php if(!empty($qualitySignal)) : ?>
                 <td style='padding:0;width:15px;text-align: center'>
-                    <div class="signal <?=$qualitySignal['icon'];?>">
+                    <div class="signal <?=$qualitySignal['icon'];?>" title="<?= $wirelesSig ?>">
                         <span></span>
                         <span></span>
                         <span></span>
@@ -192,7 +192,7 @@
         <?php foreach ($nameOfMacAddress as $res) : ?>
             <tr>
                 <td style='padding:0;width:15px;'>
-                    <div class="signal <?=$res['dBmSignal'];?>" align="right">
+                    <div class="signal <?=$res['dBmSignal'];?>" title="<?= $res['signal']?>">
                         <span></span>
                         <span></span>
                         <span></span>

@@ -37,6 +37,9 @@ if ($ip === true) {
     $wireless = isset($wireless) && !empty($wireless) ? $wireless : [];
 
 
+    $wirelesSig = wirelesSignalSum($associatedLines);
+    $wirelesSig = isset($wirelesSig) && !empty($wirelesSig) ? $wirelesSig : '';
+
     $command = 'cat /tmp/dhcp.leases';
     $dhcpResult = $clientOld->exec($command);
     $dhcpResults = linesRemove($dhcpResult);
@@ -112,15 +115,8 @@ if ($ip === true) {
 
 
     if (isset($_GET['restart']) && $_GET['restart']) {
-
-        sleep(40);
-//        $reboot = $clientNew->execute( 'reboot');
-
-        echo 'rebooted';
-
+        $reboot = $clientNew->execute( 'reboot');
     }
-
-
 
     include ROOT_DIR . '/views/tables.php';
 

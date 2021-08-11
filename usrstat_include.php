@@ -94,9 +94,13 @@ $excludeKeys = [
 ];
 
 ?>
-<script src="http://<?= $eoc_ip; ?>/luci-static/resources/xhr.js"></script>
+<!--<script src="http://--><?//= $eoc_ip; ?><!--/luci-static/resources/xhr.js"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<link rel="stylesheet" href="css/staticStyle.css" type="text/css"/>
+<!--<link rel="stylesheet" href="css/staticStyle.css" type="text/css"/>-->
+<link rel="stylesheet" href="S1/css/staticStyle.css" type="text/css"/>
+
+<!--<script src="telnet/views/xhr.js"></script>-->
+<script src="S1/telnet/views/xhr.js"></script>
 
 <table class='table_1'>
     <tr>
@@ -273,8 +277,6 @@ $excludeKeys = [
             </tr>
 </table>
 
-<div class="countdown"></div>
-
 
 <style>
 
@@ -296,7 +298,8 @@ $excludeKeys = [
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                url: "<?=getPathTo('/telnet/index.php')?>",
+                //url: "<?//=getPathTo('/telnet/index.php')?>//",
+                url: "<?=getPathTo('S1/telnet/index.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
@@ -312,13 +315,18 @@ $excludeKeys = [
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/index.php')?>",
+                    url: "<?php echo getPathTo('S1/telnet/index.php')?>",
+                    //url: "<?php //echo getPathTo('/telnet/index.php')?>//",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
+                        $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
+                    },
+                    success: function(result) {
+
                         $("#telnet_html").empty();
                         $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
                         $('.countdown').css('display', 'block')
-                        var countdown = 40;
+                        var countdown = 45;
                         setInterval(function() {
                             countdown--;
                             var view = '00:' + countdown;
@@ -328,22 +336,26 @@ $excludeKeys = [
                             if (countdown >= 0) {
                                 $('.countdown').html(view)
                             }
+                            if (countdown === 0) {
+                                $('.countdown').css('display', 'none')
+                                $("#telnet_html").html('rebooted')
+                                $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                            }
                         }, 1000)
-                    },
-                    success: function(result) {
-                        $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
-                        $('.countdown').css('display', 'none')
-                        // console.log(result);
-                        $("#telnet_html").html(result)
                     }
                 });
             }
+
         })
+
         $('#Traffic a').click(function() {
                 $.ajax({
-                    url: "<?php echo getPathTo('/telnet/views/traffic.php')?>",
-                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('/telnet/gettraffic.php')?>",
-                        "svg": "<?=getPathTo('/telnet/bandwidth.svg')?>"},
+                    //url: "<?php //echo getPathTo('/telnet/views/traffic.php')?>//",
+                    //data: {"eoc_ip": "<?//=$eoc_ip?>//", "traffic_url": "<?//=getPathTo('/telnet/gettraffic.php')?>//",
+                    //    "svg": "<?//=getPathTo('/telnet/bandwidth.svg')?>//"},
+                    url: "<?php echo getPathTo('S1/telnet/views/traffic.php')?>",
+                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('S1/telnet/gettraffic.php')?>",
+                        "svg": "<?=getPathTo('S1/telnet/bandwidth.svg')?>"},
                     beforeSend: function () {
                         //
                     },
@@ -354,13 +366,14 @@ $excludeKeys = [
         })
         $('#speedtest a').click(function() {
             $.ajax({
-                url: "<?php echo getPathTo('/telnet/get_speed_test.php')?>",
+                //url: "<?php //echo getPathTo('/telnet/speedtest.php')?>//",
+                url: "<?php echo getPathTo('S1/telnet/speedtest.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function () {
                     //
                 },
                 success: function(result) {
-                    $("#telnet_html").html(result);
+                    $("#speedtest_html").html(result);
                 }
             });
         })
@@ -369,6 +382,7 @@ $excludeKeys = [
 </script>
 
 <div id="telnet_html"></div>
+<div class="countdown"></div>
 
 
 

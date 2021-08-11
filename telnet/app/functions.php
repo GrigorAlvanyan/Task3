@@ -32,13 +32,16 @@ function getAssociatedStations($associatedStationLines)
             $associatedStations[$mac]['mac'] = $mac;
             if (isset($macAddress[1]) && !empty($macAddress[1])) {
                 $signal = explode(' (', $macAddress[1]);
-                $associatedStations[$mac]['signal'] = $signal[0];
                 $signals = explode('/', $signal[0]);
                 $dBmFrom = (float) getdBmValue($signals[0]);
                 $associatedStations[$mac]['dBmFrom']  = $dBmFrom;
                 $dBmTo = (float) getdBmValue($signals[1]);
                 $associatedStations[$mac]['dBmTo'] = $dBmTo;
                 $associatedStations[$mac]['dBmSignal'] = getdBmSignal($dBmFrom, $dBmTo);
+                $signals[0] = 'Signal: ' . $signals[0];
+                $signals[1] = ' Noise: ' . $signals[1];
+                $signals = implode('/', $signals);
+                $associatedStations[$mac]['signal'] = $signals;
 
             }
         } elseif (strpos($line, 'RX:')) {
@@ -213,6 +216,7 @@ function getDeviceNameByMacAddress($macAddress)
 
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
+
     foreach ($associatedLines as $key => $associatedValue) {
 
         $mac = substr($key, 0, 8);
@@ -365,7 +369,6 @@ function getModel($model)
 //todo need optimization
 function getNetWork($network)
 {
-//    dd($network);die;
     $networks = [];
 
     $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
@@ -375,7 +378,6 @@ function getNetWork($network)
         $networks['Address'] = $address . '/' . $mask;
         $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
     }
-//    $networks['Address'] = $address . '/' . $mask;
 
     $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
     if(isset($network['dns-server']) && !empty($network['dns-server'])){
@@ -390,10 +392,6 @@ function getNetWork($network)
         $uptime = getTimeConnected($uptimeTimestamp);
         $networks['uptime'] = $uptime;
     }
-
-//    $networks['uptime'] = isset($uptime) && !empty($uptime) ? $uptime : '';
-
-
 
    return $networks;
 }
@@ -468,3 +466,37 @@ function getserialNumber($serial, $superUserLogin)
 
     return $serial;
 }
+
+
+function wirelesSignalSum($signals)
+{
+    $wirelesSignalSum = '';
+    if (isset($signals) && !empty($signals)) {
+        $signalSum = 0;
+        $noiceSum = 0;
+        $k = 0;
+        foreach ($signals as $item) {
+            $k++;
+            $noise = (int) $item['dBmTo'];
+            $signalDbm = (int) $item['dBmFrom'];
+            $signalSum += (-1 * $signalDbm);
+            $noiceSum += (-1 * $noise);
+        }
+        $signalDbm = floor($signalSum/$k);
+        $noise = floor($noiceSum/$k);
+
+        $signalDbm = 'Signal: ' . '-' . $signalDbm .' dBm';
+        $noise = 'Noise' . '-' . $noise . ' dBm';
+
+        $wirelesSignalSum = $signalDbm . ' / ' . $noise;
+    } else {
+        $wirelesSignalSum = 'Signal: 0 dBm / Noise: -95 dBm';
+
+        return $wirelesSignalSum;
+    }
+
+    return $wirelesSignalSum;
+
+
+}
+

@@ -2,7 +2,6 @@
  * xhr.js - XMLHttpRequest helper class
  * (c) 2008-2010 Jo-Philipp Wich
  */
-
 XHR = function()
 {
 

@@ -34,3 +34,6 @@ $k = str_replace(',,', ',', $k);
 
 
 echo $k;
+
+
+

@@ -325,7 +325,7 @@ String.format = function()
 
 
                     /* render datasets, start update interval */
-                        XHR.poll(10, "<?= $_GET['traffic_url'] ?>", {"eoc_ip":"<?= $_GET['eoc_ip'] ?>"},
+                        XHR.poll(3, "<?= $_GET['traffic_url'] ?>", {"eoc_ip":"<?= $_GET['eoc_ip'] ?>"},
                         function(data, x)
                         {
 
