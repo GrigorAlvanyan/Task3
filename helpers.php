@@ -28,9 +28,6 @@ function isLocal()
 function serverUri($withQueryParams = true)
 {
     $uri = $_SERVER['REQUEST_URI'];
-    if (!$withQueryParams) {
-        $uri = substr($uri, 0, strpos($uri, '?'));
-    }
 
     return $uri;
 }
@@ -40,13 +37,9 @@ function getPathTo($path)
 {
     $path = ltrim($path, '/');
 
-    $uri = dirname(serverUri(false));
+    $uri = serverUri(false);
 
-    $path = $uri . '/' . $path;
-
-    if (!isLocal()){
-        $path = '/S1' . $path;
-    }
+    $path = $uri . $path;
 
     return $path;
 }

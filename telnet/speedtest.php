@@ -14,16 +14,16 @@ if ($ip === true) {
 
     $clientOld = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
 
-//    $command = 'cd /tmp';
-//    $speedTest = $clientOld->exec($command);
-//
-//    $command = 'wget http://212.183.159.230/20MB.zip';
-//    $speedTest = $clientOld->exec($command);
-//    $cmdResults = linesRemove($speedTest);
-//    dd($cmdResults);
-//
-//    $command = 'rm 20MB.zip';
-//    $speedTest = $clientOld->exec($command);
+    $command = 'cd /tmp';
+    $speedTest = $clientOld->exec($command);
+
+    $command = 'wget http://212.183.159.230/20MB.zip';
+    $speedTest = $clientOld->exec($command);
+    $cmdResults = linesRemove($speedTest);
+    dd($cmdResults);
+
+    $command = 'rm 20MB.zip';
+    $speedTest = $clientOld->exec($command);
 
 
 } else {

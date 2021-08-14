@@ -33,7 +33,8 @@ $k = str_replace('"', '', $k);
 $k = str_replace(',,', ',', $k);
 
 
-echo $k;
 
+
+echo $k;
 
 

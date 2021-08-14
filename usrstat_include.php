@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 
 define('ROOT_DIR', __DIR__);
 
-///
+
 require_once ROOT_DIR . '/helpers.php';
 require_once ROOT_DIR . '/src/db/functions.php';
 require_once ROOT_DIR . '/src/app/functions.php';
@@ -17,7 +17,7 @@ $filteredNames = isset($configs['filteredNames']) ? $configs['filteredNames'] : 
 $configTdataRanges = isset($configs['tdata_ranges']) ? $configs['tdata_ranges'] : [];
 
 if (isLocal()) {
-    $eoc_ip = isset($_GET['eoc_ip']) && !empty($_GET['eoc_ip']) ? $_GET['eoc_ip'] : '';
+    $eoc_ip = $row[15];
 } else {
     $eoc_ip = str_replace(';','<br>',trim(filter($row[15]),';'));
 }
@@ -27,11 +27,12 @@ $severityValue = [];
 
 $connection = dbConnection($configs['db_params'], null);
 
-if (isset($_GET['name']) && !empty($_GET['name'])) {
-    $nodeName = $_GET['name'];
+if (isLocal()) {
+    $nodeName = $personalinfo[2];
 } else {
     $nodeName = $personalinfo[2];
 }
+
 
 
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
@@ -46,8 +47,8 @@ $objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
 
 if (!empty($objectProp)) {
 
-    if (isset($_GET['mac']) && !empty($_GET['mac'])) {
-        $macName = $_GET['mac'];
+    if (isLocal()) {
+        $macName = $personalinfo[43];
         if(strlen(implode('', explode(':', trim($macName)))) == 12){
             $eoc_mac = implode('', explode(':', trim($macName)));
             $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp);
@@ -96,11 +97,10 @@ $excludeKeys = [
 ?>
 <!--<script src="http://--><?//= $eoc_ip; ?><!--/luci-static/resources/xhr.js"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!--<link rel="stylesheet" href="css/staticStyle.css" type="text/css"/>-->
 <link rel="stylesheet" href="S1/css/staticStyle.css" type="text/css"/>
 
-<!--<script src="telnet/views/xhr.js"></script>-->
 <script src="S1/telnet/views/xhr.js"></script>
+<!--<script src="S1/telnet/views/xhr.js"></script>-->
 
 <table class='table_1'>
     <tr>
@@ -248,29 +248,29 @@ $excludeKeys = [
     <?php endif; ?>
     <tr>
         <td>
-            <button id="get_tables">
+            <button id="get_tables" title="Telnet Info">
                 <span style="display: block; float: left">Telnet info</span>
-                <img src="img/preloader.gif" alt="" class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px; ">
+                <img src="img/preloader.gif" alt="Telnet Info"  class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px;" >
             </button>
         </td>
         <td>
             <div id="Traffic">
                 <a href="javascript:void(0)">
-                    <img src="img/traffic.png" alt="" style="width: 35px; height: 35px;">
+                    <img src="img/traffic.png" alt="Show Graphs" style="width: 35px; height: 35px;" title="Show Graphs">
                 </a>
             </div>
         </td>
         <td>
             <div id="speedtest" style="margin-right: 30px">
                 <a href="javascript:void(0)">
-                    <img src="img/speed_test.png" alt="" style="width: 35px; height: 35px;">
+                    <img src="img/speed_test.png" alt="Make SpeedTest" style="width: 35px; height: 35px;" title="Make SpeedTest">
                 </a>
             </div>
         </td>
         <td>
             <div id="restartRouter" >
                 <a href="javascript:void(0)">
-                    <img src="img/restart.png" alt="" style="width: 35px; height: 35px;">
+                    <img src="img/restart.png" alt="Reboot" style="width: 35px; height: 35px;" title="Reboot">
                 </a>
             </div>
         </td>
@@ -292,14 +292,30 @@ $excludeKeys = [
         text-align: center;
         border-radius: 5px;
     }
+
+    /*.countdownSpeedTest {*/
+    /*    display: none;*/
+    /*    width: 110px;*/
+    /*    height: 110px;*/
+
+    /*    border-radius: 5px;*/
+    /*}*/
+
+    /*//margin-left: 10px;*/
+
+
+    
+    
 </style>
+
 
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
-                //url: "<?//=getPathTo('/telnet/index.php')?>//",
                 url: "<?=getPathTo('S1/telnet/index.php')?>",
+
+                //url: "<?//=getPathTo('S1/telnet/index.php')?>//",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
@@ -312,11 +328,11 @@ $excludeKeys = [
             });
         });
 
+
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
                 $.ajax({
                     url: "<?php echo getPathTo('S1/telnet/index.php')?>",
-                    //url: "<?php //echo getPathTo('/telnet/index.php')?>//",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "restart": true},
                     beforeSend: function () {
                         $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
@@ -350,9 +366,6 @@ $excludeKeys = [
 
         $('#Traffic a').click(function() {
                 $.ajax({
-                    //url: "<?php //echo getPathTo('/telnet/views/traffic.php')?>//",
-                    //data: {"eoc_ip": "<?//=$eoc_ip?>//", "traffic_url": "<?//=getPathTo('/telnet/gettraffic.php')?>//",
-                    //    "svg": "<?//=getPathTo('/telnet/bandwidth.svg')?>//"},
                     url: "<?php echo getPathTo('S1/telnet/views/traffic.php')?>",
                     data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('S1/telnet/gettraffic.php')?>",
                         "svg": "<?=getPathTo('S1/telnet/bandwidth.svg')?>"},
@@ -360,29 +373,40 @@ $excludeKeys = [
                         //
                     },
                     success: function(result) {
-                        $("#telnet_html").html(result);
+                        $("#telnet_html").empty();
+                        $("#countdownSpeedTest").empty();
+                        $("#traffic_html").html(result);
                     }
                 });
         })
         $('#speedtest a').click(function() {
             $.ajax({
-                //url: "<?php //echo getPathTo('/telnet/speedtest.php')?>//",
                 url: "<?php echo getPathTo('S1/telnet/speedtest.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function () {
-                    //
+                    $("#telnet_html").empty();
+                    $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
+
                 },
                 success: function(result) {
-                    $("#speedtest_html").html(result);
+                    $("#telnet_html").empty();
+                    $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                    $('#Speed').css('display', 'block')
+                    $("#SpeedTest").html(result);
                 }
             });
         })
+
     });
 
 </script>
 
 <div id="telnet_html"></div>
+<div id="traffic_html"></div>
 <div class="countdown"></div>
+<div id="Speed" style="display: none">
+    <textarea id="SpeedTest" name="speedTest" rows="6" cols="100"></textarea>
+</div>
 
 
 
