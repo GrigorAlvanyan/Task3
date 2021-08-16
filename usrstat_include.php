@@ -248,82 +248,52 @@ $excludeKeys = [
     <?php endif; ?>
     <tr>
         <td>
-            <button id="get_tables" title="Telnet Info">
+            <button id="get_tables" title="Telnet Info" >
                 <span style="display: block; float: left">Telnet info</span>
                 <img src="img/preloader.gif" alt="Telnet Info"  class="preloader" style="display:none; margin-left: 10px; width: 15px; height: 15px;" >
             </button>
         </td>
         <td>
-            <div id="Traffic">
+            <div id="speedTest" style="float: right">
+                <a href="javascript:void(0)">
+                    <img src="img/speed_test.png" alt="Make SpeedTest" style="width: 35px; height: 35px;" title="Make SpeedTest">
+                    <img src="img/preloader.gif"  class="SpeedTestpreloader" style="display:none; margin-left: 10px; width: 15px; height: 15px;" >
+                </a>
+            </div>
+            <div id="Traffic" >
                 <a href="javascript:void(0)">
                     <img src="img/traffic.png" alt="Show Graphs" style="width: 35px; height: 35px;" title="Show Graphs">
                 </a>
             </div>
+
         </td>
         <td>
-            <div id="speedtest" style="margin-right: 30px">
-                <a href="javascript:void(0)">
-                    <img src="img/speed_test.png" alt="Make SpeedTest" style="width: 35px; height: 35px;" title="Make SpeedTest">
-                </a>
-            </div>
-        </td>
-        <td>
-            <div id="restartRouter" >
+            <div id="restartRouter">
                 <a href="javascript:void(0)">
                     <img src="img/restart.png" alt="Reboot" style="width: 35px; height: 35px;" title="Reboot">
                 </a>
             </div>
         </td>
+
             </tr>
 </table>
-
-
-<style>
-
-    .countdown {
-        display: none;
-        width: 100px;
-        height: 50px;
-        background-color: #ebc85d;
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        line-height: 50px;
-        text-align: center;
-        border-radius: 5px;
-    }
-
-    /*.countdownSpeedTest {*/
-    /*    display: none;*/
-    /*    width: 110px;*/
-    /*    height: 110px;*/
-
-    /*    border-radius: 5px;*/
-    /*}*/
-
-    /*//margin-left: 10px;*/
-
-
-    
-    
-</style>
-
 
 <script>
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
                 url: "<?=getPathTo('S1/telnet/index.php')?>",
-
-                //url: "<?//=getPathTo('S1/telnet/index.php')?>//",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function() {
                     $('.preloader').css('display', 'block')
+                    $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
                 },
                 success: function(result) {
-                    $('.preloader').css('display', 'none')
+                    $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                    $('#SpeedTest a').css({'pointer-events': 'none', 'cursor': 'no-drop'})
+                    $("#traffic_html").empty()
+                    $("#Speed, .preloader").css('display', 'none')
                     $("#telnet_html").html(result);
-                    // $('#restartRouter').css('display', 'block')
                 }
             });
         });
@@ -338,8 +308,8 @@ $excludeKeys = [
                         $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
                     },
                     success: function(result) {
-
-                        $("#telnet_html").empty();
+                        $("#traffic_html, #telnet_html").empty()
+                        $("#Speed").css('display', 'none')
                         $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
                         $('.countdown').css('display', 'block')
                         var countdown = 45;
@@ -354,8 +324,9 @@ $excludeKeys = [
                             }
                             if (countdown === 0) {
                                 $('.countdown').css('display', 'none')
-                                $("#telnet_html").html('rebooted')
+                                $("#telnet_html").html('<em>rebooted</em>')
                                 $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                                $('#SpeedTest a').css({'pointer-events': 'none', 'cursor': 'no-drop'})
                             }
                         }, 1000)
                     }
@@ -365,34 +336,35 @@ $excludeKeys = [
         })
 
         $('#Traffic a').click(function() {
-                $.ajax({
-                    url: "<?php echo getPathTo('S1/telnet/views/traffic.php')?>",
-                    data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('S1/telnet/gettraffic.php')?>",
-                        "svg": "<?=getPathTo('S1/telnet/bandwidth.svg')?>"},
-                    beforeSend: function () {
-                        //
-                    },
-                    success: function(result) {
-                        $("#telnet_html").empty();
-                        $("#countdownSpeedTest").empty();
-                        $("#traffic_html").html(result);
-                    }
-                });
+            $.ajax({
+                url: "<?php echo getPathTo('S1/telnet/views/traffic.php')?>",
+                data: {"eoc_ip": "<?=$eoc_ip?>", "traffic_url": "<?=getPathTo('S1/telnet/gettraffic.php')?>",
+                    "svg": "<?=getPathTo('S1/telnet/bandwidth.svg')?>"},
+                beforeSend: function () {
+                    //
+                },
+                success: function(result) {
+                    $("#telnet_html,#countdownSpeedTest").empty();
+                    $("#SpeedTest a").css({'pointer-events': 'auto', 'cursor': 'pointer'})
+                    $("#traffic_html").html(result);
+                }
+            });
         })
-        $('#speedtest a').click(function() {
+        $('#speedTest a').click(function() {
             $.ajax({
                 url: "<?php echo getPathTo('S1/telnet/speedtest.php')?>",
                 data: {"eoc_ip": "<?=$eoc_ip?>"},
                 beforeSend: function () {
                     $("#telnet_html").empty();
                     $('a, button').css({'pointer-events': 'none', 'cursor': 'no-drop'})
-
+                    $('.SpeedTestpreloader').css('display', 'block')
                 },
                 success: function(result) {
                     $("#telnet_html").empty();
                     $('a, button').css({'pointer-events': 'auto', 'cursor': 'pointer'})
-                    $('#Speed').css('display', 'block')
-                    $("#SpeedTest").html(result);
+                    $("#Speed").css('display', 'block')
+                    $('.SpeedTestpreloader').css('display', 'none')
+                    $("#Speedtest").html(result);
                 }
             });
         })
@@ -405,8 +377,11 @@ $excludeKeys = [
 <div id="traffic_html"></div>
 <div class="countdown"></div>
 <div id="Speed" style="display: none">
-    <textarea id="SpeedTest" name="speedTest" rows="6" cols="100"></textarea>
+    <textarea id="Speedtest" name="speedTest" rows="8" cols="100"></textarea>
 </div>
+
+
+
 
 
 

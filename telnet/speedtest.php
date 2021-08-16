@@ -19,12 +19,16 @@ if ($ip === true) {
 
     $command = 'wget http://212.183.159.230/20MB.zip';
     $speedTest = $clientOld->exec($command);
-    $cmdResults = linesRemove($speedTest);
-    dd($cmdResults);
+    if (isset($speedTest) && !empty($speedTest)) {
+        $cmdResults = linesRemove($speedTest);
+        unset($cmdResults[1]);
+        foreach ($cmdResults as $line) {
+            echo $line;
+        }
+    }
 
     $command = 'rm 20MB.zip';
     $speedTest = $clientOld->exec($command);
-
 
 } else {
     echo $invalidIp;

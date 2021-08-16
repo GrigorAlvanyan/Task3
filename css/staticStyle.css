@@ -56,3 +56,23 @@
     border-radius: 2px;
     height: 100%;
 }
+
+
+.countdown {
+    display: none;
+    width: 100px;
+    height: 50px;
+    background-color: #ebc85d;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 50px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#speedtest a{
+    pointer-events: none;
+    cursor: none;
+}
+

@@ -35,11 +35,12 @@ function serverUri($withQueryParams = true)
 
 function getPathTo($path)
 {
+
     $path = ltrim($path, '/');
 
-    $uri = serverUri(false);
+    $uri = dirname(serverUri(false));
 
-    $path = $uri . $path;
+    $path = $uri . '/' . $path;
 
     return $path;
 }
