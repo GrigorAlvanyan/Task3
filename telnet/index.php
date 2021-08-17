@@ -113,6 +113,13 @@ if ($ip === true) {
     $networks = getNetWork($network);
     $networks = isset($networks) && !empty($networks) ? $networks : [];
 
+    $command = 'swconfig dev switch0 show';
+    $ports = $clientNew->execute($command);
+    $ports = linesRemove($ports);
+    $portsInfoResult = portsInfo($ports);
+    $portsInfoResult = isset($portsInfoResult) && !empty($portsInfoResult) ? $portsInfoResult : [];
+
+
 
     if (isset($_GET['restart']) && $_GET['restart']) {
         $reboot = $clientNew->execute( 'reboot');

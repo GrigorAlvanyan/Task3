@@ -254,7 +254,7 @@ $excludeKeys = [
             </button>
         </td>
         <td>
-            <div id="speedTest" style="float: right">
+            <div id="speedTest" style="float: left">
                 <a href="javascript:void(0)">
                     <img src="img/speed_test.png" alt="Make SpeedTest" style="width: 35px; height: 35px;" title="Make SpeedTest">
                     <img src="img/preloader.gif"  class="SpeedTestpreloader" style="display:none; margin-left: 10px; width: 15px; height: 15px;" >
@@ -262,7 +262,7 @@ $excludeKeys = [
             </div>
             <div id="Traffic" >
                 <a href="javascript:void(0)">
-                    <img src="img/traffic.png" alt="Show Graphs" style="width: 35px; height: 35px;" title="Show Graphs">
+                    <img src="img/allstat.png" alt="Show Graphs" style="width: 35px; height: 35px;" title="Show Graphs">
                 </a>
             </div>
 

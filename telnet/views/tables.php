@@ -63,7 +63,15 @@
         </tr>
         <?php if(!empty($networks['Type'])) :?>
             <tr>
-                <td></td>
+                <?php if(!empty($portsInfoResult)) :?>
+                    <td align="center">
+                        <?php foreach ($portsInfoResult as $port) :?>
+                            <img width=16 src='img/<?= $port['signal'] ?>'  title='<?= $port['info'] ?>'>
+                        <?php endforeach;?>
+                    </td>
+                <?php else: ?>
+                    <td></td>
+                <?php endif ?>
                 <td></td>
                 <td><strong>Type: </strong><?= $networks['Type'] ?></td>
             </tr>

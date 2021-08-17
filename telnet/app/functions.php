@@ -497,6 +497,57 @@ function wirelesSignalSum($signals)
 
     return $wirelesSignalSum;
 
+}
+
+
+function portStatus($ports, $key)
+{
+    $portInfo = [];
+    $infoLine = ltrim($ports[$key+2]);
+
+    $value = $infoLine;
+    $value = explode(' ',$value);
+
+    if ($value[2] == 'link:down') {
+        $portInfo['signal'] = 'disconnected.png';
+        $portInfo['info'] = $infoLine;
+    } else {
+        $speed = explode(':' ,$value[3]);
+        if($speed[1] == '10baseT'){
+            $portInfo['signal'] = 'err_minor.png';
+            $portInfo['info'] = $infoLine;
+        } else {
+            $portInfo['signal'] = 'connected.png';
+            $portInfo['info'] = $infoLine;
+        }
+    }
+    if (!empty($portInfo)) {
+        return $portInfo;
+    }
+}
+
+
+function portsInfo($ports)
+{
+    $portsAssoc = [];
+    if (!empty($ports)) {
+        foreach ($ports as $key => $port) {
+            if($port == 'Port 1:') {
+                $port = 'Port 1:';
+                $portsAssoc["{$port}"] = portStatus($ports, $key);
+            } elseif ($port == 'Port 2:') {
+                $port = 'Port 2:';
+                $portsAssoc["{$port}"] = portStatus($ports, $key);
+            } elseif ($port == 'Port 3:') {
+                $port = 'Port 3:';
+                $portsAssoc["{$port}"] = portStatus($ports, $key);
+            } elseif ($port == 'Port 4:') {
+                $port = 'Port 4:';
+                $portsAssoc["{$port}"] = portStatus($ports, $key);
+            }
+        }
+    }
+    return $portsAssoc;
 
 }
 
