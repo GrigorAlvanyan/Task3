@@ -4,12 +4,12 @@ namespace PhpTelnet;
 class Client
 {
 
-    var $uSleepTime = 200000; //default 1250000 //oindex = 800000
-    var $sleepTime = 800000; //default 1250000 // oindex = 800000
+    var $uSleepTime = 350000;
+    var $sleepTime = 800000;
 
     var $socketOpenTimeout = 8;
 
-    var $loginSleepTime = 800000;
+    var $loginSleepTime = 350000;
 
     var $connection = null;
 
@@ -46,6 +46,7 @@ class Client
             $this->port = $port;
             $this->username = $username;
             $this->password = $password;
+
         }
     }
 
@@ -55,6 +56,7 @@ class Client
 
             $errorNumber = 0;
             if ($this->connection = fsockopen($this->server, $this->port, $errno, $errstr, $this->socketOpenTimeout)) {
+
 
                 if ($this->username !== null || $this->password !== null) {
 
@@ -99,8 +101,11 @@ class Client
         }
     }
 
-    public function execute($cmd, $asArray = true)
+
+    public function execute($cmd, $uSleepTime = 350000, $asArray = true)
     {
+
+        $this->uSleepTime = $uSleepTime;
         $this->connect();
         fwrite($this->connection, $cmd . "\r\n");
         $this->sleep();

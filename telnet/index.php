@@ -91,34 +91,31 @@ if ($ip === true) {
     $hardwareVersion = getHardwareVersion($hardware, $superUserLogin);
     $hardwareVersion = isset($hardwareVersion) && !empty($hardwareVersion) ? $hardwareVersion : [];
 
-
     $command =  'getinfo -fwsw';
-    $software = $clientNew->execute($command);
+    $software = $clientNew->execute($command, 340000);
     $softwareVersion = getSoftwareVersion($software, $superUserLogin);
     $softwareVersion = isset($softwareVersion) && !empty($softwareVersion) ? $softwareVersion : [];
 
 
-
     $command =  'getinfo -sn';
-    $serial = $clientNew->execute($command);
+    $serial = $clientNew->execute($command,330000);
     $serialNumber = getserialNumber($serial, $superUserLogin);
     $serialNumber = isset($serialNumber) && !empty($serialNumber) ? $serialNumber : [];
 
 
-
     $command = 'ifstatus wan1';
-    $network = $clientNew->execute($command);
+    $network = $clientNew->execute($command,345000);
     $network = linesRemove($network);
     $network = json_decode(implode('', $network), 1);
     $networks = getNetWork($network);
     $networks = isset($networks) && !empty($networks) ? $networks : [];
+
 
     $command = 'swconfig dev switch0 show';
     $ports = $clientNew->execute($command);
     $ports = linesRemove($ports);
     $portsInfoResult = portsInfo($ports);
     $portsInfoResult = isset($portsInfoResult) && !empty($portsInfoResult) ? $portsInfoResult : [];
-
 
 
     if (isset($_GET['restart']) && $_GET['restart']) {
