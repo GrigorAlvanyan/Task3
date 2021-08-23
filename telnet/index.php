@@ -83,28 +83,28 @@ if ($ip === true) {
     $clientOld->disconnect();
 
     $clientNew->connect();
-    $su = $clientNew->execute('su');
-    $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
+    $su = $clientNew->execute('su',200000);
+    $su = $clientNew->execute($configs['telnet_params']['super_user_password'],200000);
 
     $command = 'getinfo -hardware';
-    $hardware = $clientNew->execute($command);
+    $hardware = $clientNew->execute($command,200000);
     $hardwareVersion = getHardwareVersion($hardware, $superUserLogin);
     $hardwareVersion = isset($hardwareVersion) && !empty($hardwareVersion) ? $hardwareVersion : [];
 
     $command =  'getinfo -fwsw';
-    $software = $clientNew->execute($command, 340000);
+    $software = $clientNew->execute($command, 200000);
     $softwareVersion = getSoftwareVersion($software, $superUserLogin);
     $softwareVersion = isset($softwareVersion) && !empty($softwareVersion) ? $softwareVersion : [];
 
 
     $command =  'getinfo -sn';
-    $serial = $clientNew->execute($command,330000);
+    $serial = $clientNew->execute($command,200000);
     $serialNumber = getserialNumber($serial, $superUserLogin);
     $serialNumber = isset($serialNumber) && !empty($serialNumber) ? $serialNumber : [];
 
 
     $command = 'ifstatus wan1';
-    $network = $clientNew->execute($command,345000);
+    $network = $clientNew->execute($command);
     $network = linesRemove($network);
     $network = json_decode(implode('', $network), 1);
     $networks = getNetWork($network);
@@ -112,7 +112,7 @@ if ($ip === true) {
 
 
     $command = 'swconfig dev switch0 show';
-    $ports = $clientNew->execute($command);
+    $ports = $clientNew->execute($command,200000);
     $ports = linesRemove($ports);
     $portsInfoResult = portsInfo($ports);
     $portsInfoResult = isset($portsInfoResult) && !empty($portsInfoResult) ? $portsInfoResult : [];

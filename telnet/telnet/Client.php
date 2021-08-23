@@ -5,9 +5,9 @@ class Client
 {
 
     var $uSleepTime = 350000;
-    var $sleepTime = 800000;
+    var $sleepTime = 500000;
 
-    var $socketOpenTimeout = 8;
+    var $socketOpenTimeout = 5;
 
     var $loginSleepTime = 350000;
 
