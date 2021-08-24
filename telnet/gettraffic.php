@@ -19,12 +19,12 @@ $clientNew->connect();
 $su = $clientNew->execute('su');
 $su = $clientNew->execute($configs['telnet_params']['super_user_password']);
 
-$uci = $clientNew->execute('uci show network.wan1.ifname');
-
+$uci = $clientNew->execute('uci show network.wan1.ifname',3);
 $eth0Val = substr($uci[1], strpos($uci[1], 'eth0'));
 $eth0 = 'luci-bwc -i' . ' ' . $eth0Val;
 
-$uci = $clientNew->execute($eth0);
+$uci = $clientNew->execute($eth0,5);
+
 $uciLines = linesRemove($uci);
 $uci = isset($uci) && !empty($uci) ? $uci : [];
 $k = $uciLines;

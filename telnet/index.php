@@ -20,18 +20,19 @@ $ip = validateIp($eoc_ip);
 
 if ($ip === true) {
 
-    $clientOld = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+//    $clientOld = telnetConnection($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
     $clientNew = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $configs['telnet_params']['username'], $configs['telnet_params']['password']);
+    $clientNew->connect();
 
     $command = 'iwinfo wlan0 assoclist';
-    $cmdResult = $clientOld->exec($command);
+    $cmdResult = $clientNew->execute($command,2);
     $cmdResults = linesRemove($cmdResult);
 
     $associatedTable = getAssociatedStations($cmdResults);
     $associatedLines = isset($associatedTable) && !empty($associatedTable) ? $associatedTable : [];
 
     $command = 'iwinfo';
-    $iwinfoResult = $clientOld->exec($command);
+    $iwinfoResult = $clientNew->execute($command,2);
     $iwinfoResults = linesRemove($iwinfoResult);
     $wireless = getWireless($iwinfoResults);
     $wireless = isset($wireless) && !empty($wireless) ? $wireless : [];
@@ -41,7 +42,7 @@ if ($ip === true) {
     $wirelesSig = isset($wirelesSig) && !empty($wirelesSig) ? $wirelesSig : '';
 
     $command = 'cat /tmp/dhcp.leases';
-    $dhcpResult = $clientOld->exec($command);
+    $dhcpResult = $clientNew->execute($command,2);
     $dhcpResults = linesRemove($dhcpResult);
     $dhcpResultArr = getDhcpLeases($dhcpResults);
     $dhcpResultArr = isset($dhcpResultArr) && !empty($dhcpResultArr) ? $dhcpResultArr : [];
@@ -52,14 +53,14 @@ if ($ip === true) {
 
 
     $command = 'uptime';
-    $uptimeResult = $clientOld->exec($command);
+    $uptimeResult = $clientNew->execute($command,2);
     $uptimeResult = linesRemove($uptimeResult);
     $uptimeResultLine = getUptime($uptimeResult);
     $uptimeResultLine = isset($uptimeResultLine) && !empty($uptimeResultLine) ? $uptimeResultLine : [];
 
 
     $command = 'date';
-    $dateResult = $clientOld->exec($command);
+    $dateResult = $clientNew->execute($command,2);
     $dateResults = linesRemove($dateResult);
     $localTimeResultLine = getLocalTime($dateResults);
     $localTimeResultLine = isset($localTimeResultLine) && !empty($localTimeResultLine) ? $localTimeResultLine : [];
@@ -69,36 +70,38 @@ if ($ip === true) {
     $qualitySignal = isset($qualitySignal) && !empty($qualitySignal) ? $qualitySignal : '';
 
     $command = 'getinfo -fw';
-    $firmwareVersion = $clientOld->exec($command);
+    $firmwareVersion = $clientNew->execute($command,2);
     $firmwareVersion = getFirmwareVersion($firmwareVersion, $telnetUsername);
 
     $firmwareVersion = isset($firmwareVersion) && !empty($firmwareVersion) ? $firmwareVersion : '';
 
     $command = 'cat /tmp/sysinfo/model';
-    $model = $clientOld->exec($command);
+    $model = $clientNew->execute($command,2);
     $model = linesRemove($model);
     $modelResult = getModel($model);
     $modelResult = isset($modelResult) && !empty($modelResult) ? $modelResult : '';
 
-    $clientOld->disconnect();
+//    $clientOld->disconnect();
 
-    $clientNew->connect();
-    $su = $clientNew->execute('su',200000);
-    $su = $clientNew->execute($configs['telnet_params']['super_user_password'],200000);
+
+    $su = $clientNew->execute('su');
+    $su = $clientNew->execute($configs['telnet_params']['super_user_password'],1.2);
+
 
     $command = 'getinfo -hardware';
-    $hardware = $clientNew->execute($command,200000);
+    $hardware = $clientNew->execute($command,1.2);
     $hardwareVersion = getHardwareVersion($hardware, $superUserLogin);
     $hardwareVersion = isset($hardwareVersion) && !empty($hardwareVersion) ? $hardwareVersion : [];
 
+
     $command =  'getinfo -fwsw';
-    $software = $clientNew->execute($command, 200000);
+    $software = $clientNew->execute($command, 1.2);
     $softwareVersion = getSoftwareVersion($software, $superUserLogin);
     $softwareVersion = isset($softwareVersion) && !empty($softwareVersion) ? $softwareVersion : [];
 
 
     $command =  'getinfo -sn';
-    $serial = $clientNew->execute($command,200000);
+    $serial = $clientNew->execute($command,1.2);
     $serialNumber = getserialNumber($serial, $superUserLogin);
     $serialNumber = isset($serialNumber) && !empty($serialNumber) ? $serialNumber : [];
 
@@ -112,7 +115,7 @@ if ($ip === true) {
 
 
     $command = 'swconfig dev switch0 show';
-    $ports = $clientNew->execute($command,200000);
+    $ports = $clientNew->execute($command,1.5);
     $ports = linesRemove($ports);
     $portsInfoResult = portsInfo($ports);
     $portsInfoResult = isset($portsInfoResult) && !empty($portsInfoResult) ? $portsInfoResult : [];

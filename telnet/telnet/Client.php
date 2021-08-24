@@ -4,12 +4,12 @@ namespace PhpTelnet;
 class Client
 {
 
-    var $uSleepTime = 350000;
-    var $sleepTime = 500000;
+    var $uSleepTime = 300000;
+    var $sleepTime = 300000;
 
     var $socketOpenTimeout = 5;
-
-    var $loginSleepTime = 350000;
+ 
+    var $loginSleepTime = 250000;
 
     var $connection = null;
 
@@ -62,6 +62,7 @@ class Client
 
                     $r = $this->getResponse();
                     $r = explode("\n", $r);
+
                     $this->loginPrompt = $r[count($r) - 1];
 
 
@@ -102,20 +103,22 @@ class Client
     }
 
 
-    public function execute($cmd, $uSleepTime = 350000, $asArray = true)
+    public function execute($cmd, $uSleepTime = 3.5, $asArray = true)
     {
-
-        $this->uSleepTime = $uSleepTime;
+        $this->uSleepTime = $uSleepTime * 100000;
         $this->connect();
+
         fwrite($this->connection, $cmd . "\r\n");
+
+
         $this->sleep();
         $r = $this->getResponse();
+
         if ($asArray) {
             $result = explode(PHP_EOL, $r);
         } else {
             $result = $r;
         }
-
         return $result;
     }
 
@@ -130,12 +133,16 @@ class Client
         do {
             $r .= fread($this->connection, 10000); //length 1000
             $s = socket_get_status($this->connection);
-        } while ($s['unread_bytes']);
+
+        } while ($s['unread_bytes']) ;
         return $this->removeNonPrintableCharacters($r);
     }
 
+
+    var $k = 0;
     function sleep($sleepTime = null)
     {
+        $this->k++;
         if ($sleepTime === null) {
             usleep($this->uSleepTime);
         } else {
