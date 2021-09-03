@@ -2194,7 +2194,7 @@ class Worker
     public function __construct($socket_name = '', array $context_option = array())
     {
         // Save all worker instances.
-        $this->workerId                    = \spl_object_hash($this);
+        $this->workerId  = \spl_object_hash($this);
         static::$_workers[$this->workerId] = $this;
         static::$_pidMap[$this->workerId]  = array();
 
