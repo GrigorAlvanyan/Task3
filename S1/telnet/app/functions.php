@@ -251,46 +251,56 @@ function getUptime($uptimeResult)
 {
     $dayValue = '';
     $dateValue = '';
-    $uptimeResultvalues = explode(', ', $uptimeResult[1]);
-    if (strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
-        $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
-        if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
-            $dayValue[3] = 'd';
-        }
-        unset($dayValue[0], $dayValue[1]);
-        $dayValue = implode('', $dayValue);
+    if (!isset($uptimeResult[1])) {
+        return null;
     } else {
-        $uptimeResultvalues[1] = ltrim(substr($uptimeResultvalues[0], (strpos($uptimeResultvalues[0], 'up') + strlen('up '))));
-    }
-    if (strpos($uptimeResultvalues[1], ':')) {
+        $uptimeResultvalues = explode(', ', $uptimeResult[1]);
+        if (strpos($uptimeResultvalues[0], 'day') || strpos($uptimeResultvalues[0], 'days')) {
+            $dayValue = explode(' ', ltrim($uptimeResultvalues[0]));
+            if ($dayValue[3] == 'day' || $dayValue[3] == 'days') {
+                $dayValue[3] = 'd';
+            }
+            unset($dayValue[0], $dayValue[1]);
+            $dayValue = implode('', $dayValue);
+        } else {
+            $uptimeResultvalues[1] = ltrim(substr($uptimeResultvalues[0], (strpos($uptimeResultvalues[0], 'up') + strlen('up '))));
+        }
+        if (strpos($uptimeResultvalues[1], ':')) {
 
-        $hourMinut = explode(':', $uptimeResultvalues[1]);
-        $hourMinut[0] .= 'h';
-        if (strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
-            $hourMinut[1] = $hourMinut[1][1];
+            $hourMinut = explode(':', $uptimeResultvalues[1]);
+            $hourMinut[0] .= 'h';
+            if (strlen($hourMinut[1]) == 2 && $hourMinut[1][0] == 0) {
+                $hourMinut[1] = $hourMinut[1][1];
+            }
+            $hourMinut[1] .= 'm';
+            $dateValue = implode(' ', $hourMinut);
+        } elseif (strpos($uptimeResultvalues[1], 'min')) {
+            $dateValue = str_replace(' min', 'm', $uptimeResultvalues[1]);
+        } else {
+            $hourMinut = $uptimeResultvalues[1];
+            $hourMinut .= 'h';
+            $dateValue = $hourMinut;
         }
-        $hourMinut[1] .= 'm';
-        $dateValue = implode(' ', $hourMinut);
-    } elseif (strpos($uptimeResultvalues[1], 'min')) {
-        $dateValue = str_replace(' min', 'm', $uptimeResultvalues[1]);
-    } else {
-        $hourMinut = $uptimeResultvalues[1];
-        $hourMinut .= 'h';
-        $dateValue = $hourMinut;
+        $uptime = $dayValue . ' ' . $dateValue;
+        $uptime .= ' ' . secondsToWords(time());
+        return $uptime;
     }
-    $uptime = $dayValue . ' ' . $dateValue;
-    $uptime .= ' ' . secondsToWords(time());
-    return $uptime;
+
+
 }
 
 function getLocalTime($dateResults)
 {
-    $line = explode(' ', $dateResults[1]);
-    $lineSize = count($line);
-    $lineSize -= 2;
-    unset($line[$lineSize]);
-    $line = implode(' ', $line);
-    return $line;
+    if (!isset($dateResults[1])) {
+        return null;
+    } else {
+        $line = explode(' ', $dateResults[1]);
+        $lineSize = count($line);
+        $lineSize -= 2;
+        unset($line[$lineSize]);
+        $line = implode(' ', $line);
+        return $line;
+    }
 }
 
 function getdBmSignal($dBmFrom, $dBmTo)
@@ -314,41 +324,49 @@ function getdBmSignal($dBmFrom, $dBmTo)
 function getQualitySignal($wireless)
 {
     $qualitySignal = [];
-    $qualityValues = explode('/', $wireless['Quality']);
-    $qualityMin = (double) $qualityValues[0];
-    $qualityMax = (double) $qualityValues[1];
-    $result = (int) (($qualityMin * 100) / $qualityMax);
+    if (!isset($wireless['Quality'])) {
+        return null;
+    } else {
+        $qualityValues = explode('/', $wireless['Quality']);
+        $qualityMin = (double) $qualityValues[0];
+        $qualityMax = (double) $qualityValues[1];
+        $result = (int) (($qualityMin * 100) / $qualityMax);
 
-    if($result > 0 && $result <= 25) {
-        $class = "signal-0-25";
-    } elseif ($result > 25 && $result <= 50) {
-        $class = "signal-25-50";
-    } elseif ($result > 50 && $result <= 75) {
-        $class = "signal-50-75";
-    } elseif ($result > 75 && $result <= 100) {
-        $class = "signal-75-100";
-    } elseif ($result == 0) {
-        $class = "signal-0";
+        if($result > 0 && $result <= 25) {
+            $class = "signal-0-25";
+        } elseif ($result > 25 && $result <= 50) {
+            $class = "signal-25-50";
+        } elseif ($result > 50 && $result <= 75) {
+            $class = "signal-50-75";
+        } elseif ($result > 75 && $result <= 100) {
+            $class = "signal-75-100";
+        } elseif ($result == 0) {
+            $class = "signal-0";
+        }
+        $result .= '%';
+        $qualitySignal['result'] = $result;
+        $qualitySignal['icon'] = $class;
+
+        return $qualitySignal;
     }
-    $result .= '%';
-    $qualitySignal['result'] = $result;
-    $qualitySignal['icon'] = $class;
 
-    return $qualitySignal;
 }
 
 
 function getFirmwareVersion($firmwareVersion, $telnetUsername)
 {
-    $telnetUsername = $telnetUsername . '@';
-    $firmwareVersion = substr($firmwareVersion[1], 0, strpos($firmwareVersion[1], "$telnetUsername"));
+    if(!isset($firmwareVersion[1])) {
+        return null;
+    } else {
+        $telnetUsername = $telnetUsername . '@';
+        $firmwareVersion = substr($firmwareVersion[1], 0, strpos($firmwareVersion[1], "$telnetUsername"));
 
-    return $firmwareVersion;
+        return $firmwareVersion;
+    }
 }
 
 function getModel($model)
 {
-
 
     if (!isset($model[1])) {
         return null;
@@ -369,38 +387,43 @@ function getModel($model)
 //todo need optimization
 function getNetWork($network)
 {
+
     $networks = [];
+    if (isset($network) && !empty($network)) {
 
-    $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
-    $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
-    $mask = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
-    if(!empty($address) && !empty($mask)){
-        $networks['Address'] = $address . '/' . $mask;
-        $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
-    }
-
-    $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
-    if(isset($network['dns-server']) && !empty($network['dns-server'])){
-        $j = 1;
-        for ($i = 0; $i < count($network['dns-server']); $i++) {
-            $networks['DNS']["DNS {$j}: "] =  $network['dns-server'][$i];
-            $j++;
+        $networks['Type'] = isset($network['proto']) && !empty($network['proto']) ? $network['proto'] : '';
+        $address = isset($network['ipv4-address'][0]['address']) && !empty($network['ipv4-address'][0]['address']) ? $network['ipv4-address'][0]['address'] : '';
+        $mask = isset($network['ipv4-address'][0]['mask']) && !empty($network['ipv4-address'][0]['mask']) ? $network['ipv4-address'][0]['mask'] : '';
+        if(!empty($address) && !empty($mask)){
+            $networks['Address'] = $address . '/' . $mask;
+            $networks['Netmask'] = cidr2NetmaskAddr($networks['Address']);
         }
-    }
-    $uptimeTimestamp = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
-    if (!empty($uptimeTimestamp)) {
-        $uptime = getTimeConnected($uptimeTimestamp);
-        $networks['uptime'] = $uptime;
+
+        $networks['Gateway'] = isset($network['route'][0]['nexthop']) && !empty($network['route'][0]['nexthop']) ? $network['route'][0]['nexthop'] : '';
+        if(isset($network['dns-server']) && !empty($network['dns-server'])){
+            $j = 1;
+            for ($i = 0; $i < count($network['dns-server']); $i++) {
+                $networks['DNS']["DNS {$j}: "] =  $network['dns-server'][$i];
+                $j++;
+            }
+        }
+        $uptimeTimestamp = isset($network['uptime']) && !empty($network['uptime']) ? $network['uptime'] : '';
+        if (!empty($uptimeTimestamp)) {
+            $uptime = getTimeConnected($uptimeTimestamp);
+            $networks['uptime'] = $uptime;
+        }
+
+        return $networks;
+    } else {
+        return null;
     }
 
-   return $networks;
 }
 
 
 
 function cidr2NetmaskAddr ($cidr)
 {
-
     $ta = substr ($cidr, strpos ($cidr, '/') + 1) * 1;
     $netmask = str_split (str_pad (str_pad ('', $ta, '1'), 32, '0'), 8);
 
@@ -445,26 +468,38 @@ function validateIp($ip)
 
 function getHardwareVersion($hardware, $superUserLogin)
 {
-    $superUserLogin = $superUserLogin . '@';
-    $hardware = substr($hardware[1], 0, strpos($hardware[1], "{$superUserLogin}"));
+    if (!isset($hardware[1])) {
+        return null;
+    } else {
+        $superUserLogin = $superUserLogin . '@';
+        $hardware = substr($hardware[1], 0, strpos($hardware[1], "{$superUserLogin}"));
 
-    return $hardware;
+        return $hardware;
+    }
 }
 
 function getSoftwareVersion($software, $superUserLogin)
 {
-    $superUserLogin = $superUserLogin . '@';
-    $software = substr($software[1], 0, strpos($software[1], "{$superUserLogin}"));
+    if (!isset($software[1])) {
+        return null;
+    } else {
+        $superUserLogin = $superUserLogin . '@';
+        $software = substr($software[1], 0, strpos($software[1], "{$superUserLogin}"));
 
-    return $software;
+        return $software;
+    }
 }
 
 function getserialNumber($serial, $superUserLogin)
 {
-    $superUserLogin = $superUserLogin . '@';
-    $serial = substr($serial[1], 0, strpos($serial[1], "{$superUserLogin}"));
+    if (!isset($serial[1])) {
+        return null;
+    } else {
+        $superUserLogin = $superUserLogin . '@';
+        $serial = substr($serial[1], 0, strpos($serial[1], "{$superUserLogin}"));
 
-    return $serial;
+        return $serial;
+    }
 }
 
 
