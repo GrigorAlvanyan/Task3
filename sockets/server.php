@@ -1,49 +1,52 @@
+
 <?php
 error_reporting(E_ALL);
 define('ROOT_DIR', __DIR__);
 
-//require_once  ROOT_DIR . '/../vendor/autoload.php';
-//
-//use Workerman\Worker;
 
 
-// set some variables
-$host = "http://localhost/";
-$port = 25003;
-// don't timeout!
-set_time_limit(0);
+$host    = "127.0.0.11";
+$port    = 25003;
+$message = "Hello Server";
+//echo "Message To server :".$message;
 // create socket
-$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
-// bind socket to port
-$result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n");
-// start listening for connections
-$result = socket_listen($socket, 3) or die("Could not set up socket listener\n");
 
-// accept incoming connections
-// spawn another socket to handle communication
-$spawn = socket_accept($socket) or die("Could not accept incoming connection\n");
-// read client input
-$input = socket_read($spawn, 1024) or die("Could not read input\n");
-// clean up input string
-$input = trim($input);
-echo "Client Message : ".$input;
-// reverse client input and send back
-$output = strrev($input) . "\n";
-socket_write($spawn, $output, strlen ($output)) or die("Could not write output\n");
-// close sockets
-socket_close($spawn);
-socket_close($socket);
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n");
+
+$result = socket_connect($socket, $host, $port) or die("Could not connect to server\n");
+// send string to server
+socket_write($socket, $message, strlen($message)) or die("Could not send data to server\n");
+// get server response
+//$result = socket_read ($socket, 1024) or die("Could not read server response\n");
+//$serverResult = json_decode($result, 1);
+//    $accept = socket_accept($socket);
 
 
+//do {
+    $result = socket_read ($socket, 1024) or die("Could not read server response\n");
+//    $result = socket_read ($socket, 1024);
+    $serverResult = json_decode($result, 1);
+
+//    $accept = socket_accept($socket);
+//    $read   = socket_read($accept, 1024) or die("Could not read input\n");
 
 
+//} while (true);
+
+echo '<pre>';
+print_r($serverResult);
+echo '</pre>';
 
 $clientId = '';
-//if (isset($input['clid']) && !empty($input['clid'])) {
-//    $clientId = $input['clid'];
-//}
-//
-//echo $clientId;
+if (isset($serverResult['clid']) && !empty($serverResult['clid'])) {
+    $clientId = $serverResult['clid'];
+}
+
+//echo "Reply From Server  : <br>";
+//echo '<pre>';
+//print_r(json_decode($result, 1));
+// close socket
+//socket_close($socket);
 
 ?>
 
@@ -77,7 +80,7 @@ $clientId = '';
                     </button>
                 </div>
                 <div class="modal-body">
-                    <a  id="phone" ><?=$clientId?></a>
+                    Incoming call: <a  id="phone" href="http://localhost/task_3/index.php?<?=$clientId?>"><?=$clientId?></a>, Time: 18:50
                 </div>
             </div>
         </div>
@@ -90,3 +93,9 @@ $clientId = '';
 <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+

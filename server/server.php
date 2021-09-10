@@ -2,48 +2,45 @@
 error_reporting(E_ALL);
 define('ROOT_DIR', __DIR__);
 
-//require_once  ROOT_DIR . '/../vendor/autoload.php';
-//
-//use Workerman\Worker;
-
-
-// set some variables
-$host = "http://localhost/";
-$port = 25003;
-// don't timeout!
-set_time_limit(0);
-// create socket
-$socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
-// bind socket to port
-$result = socket_bind($socket, $host, $port) or die("Could not bind to socket\n");
-// start listening for connections
-$result = socket_listen($socket, 3) or die("Could not set up socket listener\n");
-
-// accept incoming connections
-// spawn another socket to handle communication
-$spawn = socket_accept($socket) or die("Could not accept incoming connection\n");
-// read client input
-$input = socket_read($spawn, 1024) or die("Could not read input\n");
-// clean up input string
-$input = trim($input);
-echo "Client Message : ".$input;
-// reverse client input and send back
-$output = strrev($input) . "\n";
-socket_write($spawn, $output, strlen ($output)) or die("Could not write output\n");
-// close sockets
-socket_close($spawn);
-socket_close($socket);
-
-
-
-
+$input = json_decode(file_get_contents("php://input"), true);
 
 $clientId = '';
-//if (isset($input['clid']) && !empty($input['clid'])) {
-//    $clientId = $input['clid'];
-//}
-//
+if (isset($input['clid']) && !empty($input['clid'])) {
+    $clientId = $input['clid'];
+}
+
+echo $clientId;
+
+//$clientId = '095399337';
+
+
+
+
 //echo $clientId;
+//
+//$ws_worker = new Worker("websocket://0.0.0.0:12345");
+//
+//$ws_worker->count = 4;
+//
+//$ws_worker->onConnect = function($connection)
+//{
+//    $connection->onWebSocketConnect = function($connection)
+//    {
+//        echo "New connection\n";
+//    };
+//};
+//
+//$ws_worker->onMessage = function($connection, $data) use ($clientId)
+//{
+//    $connection->send($clientId);
+//};
+//
+//$ws_worker->onClose = function($connection)
+//{
+//    echo "Connection closed\n";
+//};
+//
+//Worker::runAll();
 
 ?>
 
