@@ -122,11 +122,12 @@
 
 <table class="table_1">
     <tr>
-        <th colspan=4><b>DHCP Leases</b></th>
+        <th colspan=5><b>DHCP Leases</b></th>
     </tr>
     <tr>
         <th><b>Hostname</b></th>
         <th><b>IPv4-Address</b></th>
+        <th><b>Brand</b></th>
         <th><b>MAC-Address</b></th>
         <th><b>Leasetime remaining</b></th>
     </tr>

@@ -154,12 +154,14 @@ function isValidTimeStamp($timestamp)
 
 function getDhcpLeases($dhcpLeasesFileLines)
 {
+
     $dhcpLeases = [];
     foreach ($dhcpLeasesFileLines as $key => $line) {
+
         $line = array_reverse(explode(' ', $line));
         unset($line[0]);
-        foreach ($line as $item) {
 
+        foreach ($line as $item) {
             if (isValidTimeStamp($item)) {
                 $presentTime = time();
                 $presentDate = date('Y-m-d H:i:s', $presentTime);
@@ -183,15 +185,20 @@ function getDhcpLeases($dhcpLeasesFileLines)
                 }
 
             } else {
+                if (isValidMacAddress($item)) {
+                    $mac = substr($item, 0, 8);
+                    $name = getDeviceNameByMacAddress($mac);
+                    $dhcpLeases[$key][] = $name;
+                }
                 $dhcpLeases[$key][] = $item;
             }
         }
+
     }
 
     return $dhcpLeases;
 }
 
-//todo need optimization
 function getDeviceNameByMacAddress($macAddress)
 {
     $deviceName = '';
