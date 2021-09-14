@@ -220,16 +220,14 @@ function getDeviceNameByMacAddress($macAddress)
 
 function nameOfMacAddress($associatedLines, $dhcpResultArr)
 {
-
     foreach ($associatedLines as $key => $associatedValue) {
-
         $mac = substr($key, 0, 8);
         $name = getDeviceNameByMacAddress($mac);
         $associatedLines[$key]['brand'] = $name;
         foreach ($dhcpResultArr as $models) {
             foreach ($models as $model) {
                 if (strcasecmp($key, $model) == 0) {
-                    $associatedLines[$key]['hostName'] = $models[0];
+                    $associatedLines[$key]['hostName'] = $models['hostname'];
                 }
             }
         }
