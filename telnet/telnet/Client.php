@@ -4,8 +4,8 @@ namespace PhpTelnet;
 class Client
 {
 
-    var $uSleepTime = 300000;
-    var $sleepTime = 300000;
+    var $uSleepTime = 250000;
+    var $sleepTime = 250000;
 
     var $socketOpenTimeout = 5;
  
@@ -115,6 +115,8 @@ class Client
         fwrite($this->connection, $cmd . "\r\n");
 
         $r = '';
+
+        set_time_limit (5);
 
         while(!$this->strpos_arr($r, $this->users)){
             $r = $this->getResponses();
