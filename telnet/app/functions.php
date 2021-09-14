@@ -154,10 +154,8 @@ function isValidTimeStamp($timestamp)
 
 function getDhcpLeases($dhcpLeasesFileLines)
 {
-
     $dhcpLeases = [];
     foreach ($dhcpLeasesFileLines as $key => $line) {
-
         $line = array_reverse(explode(' ', $line));
         unset($line[0]);
 
@@ -167,37 +165,35 @@ function getDhcpLeases($dhcpLeasesFileLines)
                 $presentDate = date('Y-m-d H:i:s', $presentTime);
                 $differenceTime = $item - $presentTime;
                 $timeDifference = $item - $presentTime;
-
                 $timeDifference = $presentTime - $timeDifference;
-
                 $oldDate = date('Y-m-d H:i:s', $timeDifference);
-
                 $assigned_time = "{$oldDate}";
                 $completed_time = "{$presentDate}";
-
                 $d1 = new DateTime($assigned_time);
                 $d2 = new DateTime($completed_time);
                 $interval = $d2->diff($d1);
-                if($differenceTime > 86400) {
-                    $dhcpLeases[$key][] = $interval->format('%dd %hh %im %ss');
+                if ($differenceTime > 86400) {
+                    $dhcpLeases[$key]['timestamp'] = $interval->format('%dd %hh %im %ss');
                 } else {
-                    $dhcpLeases[$key][] = $interval->format(' %hh %im %ss');
+                    $dhcpLeases[$key]['timestamp'] = $interval->format(' %hh %im %ss');
                 }
-
             } else {
-                if (isValidMacAddress($item)) {
+                if (validateIp($item)) {
+                    $dhcpLeases[$key]['ip'] = $item;
+                } elseif (isValidMacAddress($item)) {
+                    $dhcpLeases[$key]['macAddress'] = $item;
                     $mac = substr($item, 0, 8);
                     $name = getDeviceNameByMacAddress($mac);
-                    $dhcpLeases[$key][] = $name;
+                    $dhcpLeases[$key]['brand'] = $name;
+                } else {
+                    $dhcpLeases[$key]['hostname'] = $item;
                 }
-                $dhcpLeases[$key][] = $item;
             }
         }
-
     }
-
     return $dhcpLeases;
 }
+
 
 function getDeviceNameByMacAddress($macAddress)
 {

@@ -126,17 +126,19 @@
     </tr>
     <tr>
         <th><b>Hostname</b></th>
-        <th><b>IPv4-Address</b></th>
         <th><b>Brand</b></th>
+        <th><b>IPv4-Address</b></th>
         <th><b>MAC-Address</b></th>
         <th><b>Leasetime remaining</b></th>
     </tr>
     <?php if(!empty($dhcpResultArr)) : ?>
         <?php foreach ($dhcpResultArr as $dhcpResult) : ?>
             <tr>
-                <?php foreach ($dhcpResult as $res) : ?>
-                    <td><?= $res; ?></td>
-                <?php endforeach; ?>
+                    <td><?php echo  isset($dhcpResult['hostname']) ? $dhcpResult['hostname'] : ''; ?></td>
+                    <td><?php echo  isset($dhcpResult['brand']) ? $dhcpResult['brand'] : ''; ?></td>
+                    <td><?php echo  isset($dhcpResult['ip']) ? $dhcpResult['ip'] : ''; ?></td>
+                    <td><?php echo  isset($dhcpResult['macAddress']) ? $dhcpResult['macAddress'] : ''; ?></td>
+                    <td><?php echo  isset($dhcpResult['timestamp']) ? $dhcpResult['timestamp'] : ''; ?></td>
             </tr>
         <?php endforeach; ?>
     <?php else:?>
