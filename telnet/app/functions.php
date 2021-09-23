@@ -248,7 +248,6 @@ function secondsToWords($seconds)
 
 
 
-//todo needs refactoring
 function getUptime($uptimeResult)
 {
     $dayValue = '';
@@ -384,7 +383,6 @@ function getModel($model)
     return $model;
 }
 
-//todo need optimization
 function getNetWork($network)
 {
     $networks = [];

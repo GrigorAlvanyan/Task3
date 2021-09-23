@@ -7,33 +7,27 @@ function dbConnection($dbConfigs, $personalinfo)
     return $connection;
 }
 
-function getMaccAddress($connection, $eoc_mac, $objectProp)
+function getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage)
 {
     $macAddressTables = [];
     $numb = 0;
     if (isset($objectProp['object_id'])) {
         $tdata = 'tdata_' .  $objectProp['object_id'];
         $isLocal = isLocal();
-
         if (isset($isLocal) && $isLocal) {
         $tdata = 'tdata_78528';
         }
-
         $tableIdValues = itemIdsArray($connection, $tdata);
-
             foreach ($tableIdValues as $resultItem) {
-
                 $resultValues = tdataArrayValues($connection, $tdata, $resultItem);
-
                  foreach ($resultValues as $value) {
                         $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
                         if (empty($htmlTable)) {
                             $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
                             if (empty($htmlTable)) {
-                                return 'error offset';
+                                return ['error' => 'error offset'];
                             }
                         }
-
                         $doc = new DOMDocument();
                         libxml_use_internal_errors(true);
                         @$doc->loadHTML($htmlTable);
@@ -59,7 +53,6 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
                                 $macAddressTable = [];
                                 $mac = '';
                                 $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
-
                                 $item = 0;
                                 $tablesName = [
                                     'id' => $resultItem['item_id'],
@@ -71,7 +64,6 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
                                     $val = $cols->item($i)->nodeValue . ' ';
                                     $tablesName["{$col[$item]}"] = $val;
                                 }
-
                                 $macAddressTable = $tablesName;
                                 $macAddressTables[] = $macAddressTable;
                             }
@@ -79,13 +71,12 @@ function getMaccAddress($connection, $eoc_mac, $objectProp)
                     }
             }
             if ($numb == 0) {
-                return $macAddressTables[] = 'MAC Address not found';
+                return  ['error' => 'MAC Address not found'];
             }
-            return $macAddressTables;
+        return $macAddressTables;
     } else {
-        return 'Result Table not found';
+        return ['error' => 'Result Table not found'];
     }
-
 }
 
 function getMacAddressValues($configTdataRanges, $displayNameValue, $displayName, $tableName)

@@ -46,36 +46,38 @@ $errorWrongMacAddress = '';
 $objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
 
 if (!empty($objectProp)) {
-
     if (isLocal()) {
-        $macName = $personalinfo[43];
-        if(strlen(implode('', explode(':', trim($macName)))) == 12){
-            $eoc_mac = implode('', explode(':', trim($macName)));
-            $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp);
-            if($macAddressesValue == 'error offset'){
-                $errorOffset = $macAddressesValue;
+        if(isset($personalinfo[43]) && !empty($personalinfo[43])){
+            $macName = $personalinfo[43];
+            if(strlen(implode('', explode(':', trim($macName)))) == 12){
+                $eoc_mac = implode('', explode(':', trim($macName)));
+                $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp, $errorsMessage);
+            } else {
+                $macAddressesValue['error'] = 'Wrong mac Address';
             }
         } else {
-            $errorWrongMacAddress = 'Wrong mac Address';
+            $macAddressesValue['error'] = 'No Mac Address';
         }
     } else {
         if (isset($personalinfo[43])) {
             if (strpos($personalinfo[43], "375828706861857")) {
                 $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
-                if (strlen(str_replace(":","",$eoc_tmp_array[2])) == 12){
-                    $eoc_mac = str_replace(":","",$eoc_tmp_array[2]);
-                    $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp);
-                    if($macAddressesValue == 'error offset'){
-                        $errorOffset = $macAddressesValue;
+                if(isset($eoc_tmp_array[2]) && !empty($eoc_tmp_array[2])) {
+                    if (strlen(str_replace(":", "", $eoc_tmp_array[2])) == 12) {
+                        $eoc_mac = str_replace(":", "", $eoc_tmp_array[2]);
+                        $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage);
+                    } else {
+                        $macAddressesValue['error'] = 'Wrong mac Address';
                     }
-                } else {
-                    $errorWrongMacAddress = 'Wrong mac Address';
+                }
+                else {
+                    $macAddressesValue['error'] = 'No Mac Address';
                 }
             }
         }
     }
 } else {
-    $objectProp =  'not found';
+    $macAddressesValue['error'] = 'not found';
 }
 
 $connection->close();
@@ -95,12 +97,9 @@ $excludeKeys = [
 ];
 
 ?>
-<!--<script src="http://--><?//= $eoc_ip; ?><!--/luci-static/resources/xhr.js"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link rel="stylesheet" href="S1/css/staticStyle.css" type="text/css"/>
-
 <script src="S1/telnet/views/xhr.js"></script>
-<!--<script src="S1/telnet/views/xhr.js"></script>-->
 
 <table class='table_1'>
     <tr>
@@ -151,100 +150,60 @@ $excludeKeys = [
         <?php endforeach; ?>
     <?php endif; ?>
 
-
-    <?php if($macAddressesValue == 'MAC Address not found') : ?>
-            <tr>
-                <td nowrap="nowrap"><?= 'MAC Address not found';?></td>
-            </tr>
-        <?php endif; ?>
-
-
-
-
-
-
-<!--todo improve error check-->
-    <?php if($errorWrongMacAddress != 'Wrong mac Address') : ?>
-        <?php if($macAddressesValue != 'Result Table not found') : ?>
-            <?php if($objectProp != 'not found') : ?>
-                <?php if($errorOffset != 'error offset'  && $macAddressesValue != 'MAC Address not found') :?>
-                <?php if (isset($macAddressesValue) && !empty($macAddressesValue)) : ?>
-                    <?php foreach ($macAddressesValue as $line) : ?>
-                        <?php
-                        $tdValues =[];
-                            foreach ($line as $key => $str) {
-                                $tdValue = [];
-                                $displayNameValue = '';
-                                $dispValue = '';
-                                $macStatus = '';
-                                $name = '';
-                                $strValue = '';
-                                if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
-
-                                    $displayNameValue = (int)$str;
-                                    $name = $key;
-                                    $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
-
-                                        if (isset($macValueStatuses) && !empty($macValueStatuses)) {
-
-
-                                        $strValue = $macValueStatuses['dispName'] . '<br>';
-                                        $macStatus = $macValueStatuses['statuses'];
-                                    } else {
-                                        $strValue = $name . ':' . $displayNameValue . '<br>';
-                                        $macStatus = '';
-                                    }
-                                        $tdValue = [
-                                        'strValue' => $strValue,
-                                        'macStatus' => $macStatus
-                                    ];
-                                    $tdValues[] = $tdValue;
-
-                                    }
-                            }
-
-                        ?>
-                        <tr style="vertical-align: top;">
-                            <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
-                            <td>
-                                <?php foreach ($tdValues as  $td) : ?>
-                                <div><?=  $td['strValue'] ?></div>
-                                <?php endforeach; ?>
-                            </td>
-                            <td style='padding:0;width:15px;text-align:center'>
-                                <?php foreach ($tdValues as  $td) : ?>
-                                    <div>
-                                        <img width=16 src='img/err_<?= $td['macStatus'] ?>.png' alt='<?= $td['macStatus'] ?>' title='<?= $td['macStatus'] ?>'>
-                                    </div>
-                                <?php endforeach; ?>
-                            </td>
-                        </tr>
-
+    <?php if(isset($macAddressesValue['error'])) : ?>
+        <?php foreach ($configs['error_messages']['mac_address_errors'] as $error) :?>
+            <?php if($error == $macAddressesValue['error']) :?>
+                <tr>
+                    <td nowrap="nowrap"><?= $macAddressesValue['error'];?></td>
+                </tr>
+            <?php endif ?>
+        <?php endforeach;?>
+    <?php else: ?>
+        <?php foreach ($macAddressesValue as $line) : ?>
+            <?php
+            $tdValues =[];
+            foreach ($line as $key => $str) {
+                $tdValue = [];
+                $displayNameValue = '';
+                $dispValue = '';
+                $macStatus = '';
+                $name = '';
+                $strValue = '';
+                if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
+                    $displayNameValue = (int)$str;
+                    $name = $key;
+                    $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
+                    if (isset($macValueStatuses) && !empty($macValueStatuses)) {
+                        $strValue = $macValueStatuses['dispName'] . '<br>';
+                        $macStatus = $macValueStatuses['statuses'];
+                    } else {
+                        $strValue = $name . ':' . $displayNameValue . '<br>';
+                        $macStatus = '';
+                    }
+                    $tdValue = [
+                        'strValue' => $strValue,
+                        'macStatus' => $macStatus
+                    ];
+                    $tdValues[] = $tdValue;
+                }
+            }
+            ?>
+            <tr style="vertical-align: top;">
+                <td class='even_th' title="<?= $line['id'] ?>"><?= $line['Table_Name'] ?></td>
+                <td>
+                    <?php foreach ($tdValues as  $td) : ?>
+                        <div><?=  $td['strValue'] ?></div>
                     <?php endforeach; ?>
-                <?php elseif(isset($macAddressesValue) && empty($macAddressesValue)  && empty($errorWrongMacAddress)) :?>
-                <tr>
-                    <td nowrap="nowrap"><?php echo 'No Mac Address'; ?></td>
-                </tr>
-                <?php endif; ?>
-                <?php elseif($errorOffset == 'error offset') :?>
-                    <tr>
-                        <td nowrap="nowrap"><?= 'Error offset';?></td>
-                    </tr>
-                <?php endif; ?>
-            <?php else :?>
-                <tr>
-                    <td nowrap="nowrap"><?= 'Error offset';?></td>
-                </tr>
-            <?php endif; ?>
-        <?php else :?>
-            <tr>
-                <td nowrap="nowrap"><?= 'Result Table not found';?></td>
+                </td>
+                <td style='padding:0;width:15px;text-align:center'>
+                    <?php foreach ($tdValues as  $td) : ?>
+                        <div>
+                            <img width=16 src='img/err_<?= $td['macStatus'] ?>.png' alt='<?= $td['macStatus'] ?>' title='<?= $td['macStatus'] ?>'>
+                        </div>
+                    <?php endforeach; ?>
+                </td>
             </tr>
-        <?php endif; ?>
-    <?php else :?>
-        <tr>
-            <td nowrap="nowrap"><?= 'Wrong mac Address';?></td>
-        </tr>
+        <?php endforeach; ?>
     <?php endif; ?>
     <tr>
         <td>
@@ -274,8 +233,7 @@ $excludeKeys = [
                 </a>
             </div>
         </td>
-
-            </tr>
+    </tr>
 </table>
 
 <script>
