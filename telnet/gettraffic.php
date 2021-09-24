@@ -14,7 +14,7 @@ $clientNew = new \PhpTelnet\Client($eoc_ip, $configs['telnet_params']['port'], $
 
 
 
-//todo need to change CLient.php (timeout)
+
 $clientNew->connect();
 $su = $clientNew->exec('su');
 $su = $clientNew->exec($configs['telnet_params']['super_user_password']);

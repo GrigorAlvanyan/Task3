@@ -7,6 +7,46 @@ function dbConnection($dbConfigs, $personalinfo)
     return $connection;
 }
 
+function htmlTableDecode($value, $errorsMessage){
+    $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
+    if (empty($htmlTable)) {
+        $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
+        if (empty($htmlTable)) {
+            return ['error' => $errorsMessage['mac_address_errors']['error_offset']];
+        }
+    }
+    return $htmlTable;
+}
+
+function getDomDocument($htmlTable){
+    $doc = new DOMDocument();
+    libxml_use_internal_errors(true);
+    @$doc->loadHTML($htmlTable);
+    libxml_clear_errors();
+    $doc->preserveWhiteSpace = false;
+    $table = $doc->getElementsByTagName('table');
+    $tableName = $table->item(0)->getAttribute("name");
+    $column = $doc->getElementsByTagName('column');
+    $columnCount = $column->length;
+
+    if ($columnCount > 2) {
+        $columnArr = [];
+        for ($i = 2; $i < $columnCount; $i++) {
+            $columnArr[] = $column->item($i)->getAttribute("name");
+        }
+        $col = $columnArr;
+    }
+    $rows = $table->item(0)->getElementsByTagName('tr');
+
+    return $result = [
+        'rows' => $rows,
+        'tableName' => $tableName,
+        'columnCount' => $columnCount,
+        'col' => $col
+    ];
+}
+
+
 function getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage)
 {
     $macAddressTables = [];
@@ -21,31 +61,15 @@ function getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage)
             foreach ($tableIdValues as $resultItem) {
                 $resultValues = tdataArrayValues($connection, $tdata, $resultItem);
                  foreach ($resultValues as $value) {
-                        $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
-                        if (empty($htmlTable)) {
-                            $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 5));
-                            if (empty($htmlTable)) {
-                                return ['error' => 'error offset'];
-                            }
-                        }
-                        $doc = new DOMDocument();
-                        libxml_use_internal_errors(true);
-                        @$doc->loadHTML($htmlTable);
-                        libxml_clear_errors();
-                        $doc->preserveWhiteSpace = false;
-                        $table = $doc->getElementsByTagName('table');
-                        $tableName = $table->item(0)->getAttribute("name");
-                        $column = $doc->getElementsByTagName('column');
-                        $columnCount = $column->length;
-
-                        if ($columnCount > 2) {
-                            $columnArr = [];
-                            for ($i = 2; $i < $columnCount; $i++) {
-                                $columnArr[] = $column->item($i)->getAttribute("name");
-                            }
-                            $col = $columnArr;
-                        }
-                        $rows = $table->item(0)->getElementsByTagName('tr');
+                     $htmlTable = htmlTableDecode($value, $errorsMessage);
+                     if (isset($htmlTable['error'])) {
+                         return $htmlTable;
+                     }
+                        $result = getDomDocument($htmlTable);
+                        $rows = $result['rows'];
+                        $tableName = $result['tableName'];
+                        $columnCount = $result['columnCount'];
+                        $col = $result['col'];
                         foreach ($rows as $row) {
                             $cols = $row->getElementsByTagName('td');
                             if ($cols->item(1)->nodeValue == $eoc_mac) {
@@ -71,11 +95,11 @@ function getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage)
                     }
             }
             if ($numb == 0) {
-                return  ['error' => 'MAC Address not found'];
+                return  ['error' => $errorsMessage['mac_address_errors']['mac_address_not_found']];
             }
         return $macAddressTables;
     } else {
-        return ['error' => 'Result Table not found'];
+        return ['error' => $errorsMessage['mac_address_errors']['result_table_not_found']];
     }
 }
 

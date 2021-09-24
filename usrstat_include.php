@@ -53,10 +53,10 @@ if (!empty($objectProp)) {
                 $eoc_mac = implode('', explode(':', trim($macName)));
                 $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp, $errorsMessage);
             } else {
-                $macAddressesValue['error'] = 'Wrong mac Address';
+                $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
             }
         } else {
-            $macAddressesValue['error'] = 'No Mac Address';
+            $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
         }
     } else {
         if (isset($personalinfo[43])) {
@@ -67,17 +67,17 @@ if (!empty($objectProp)) {
                         $eoc_mac = str_replace(":", "", $eoc_tmp_array[2]);
                         $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage);
                     } else {
-                        $macAddressesValue['error'] = 'Wrong mac Address';
+                        $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
                     }
                 }
                 else {
-                    $macAddressesValue['error'] = 'No Mac Address';
+                    $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
                 }
             }
         }
     }
 } else {
-    $macAddressesValue['error'] = 'not found';
+    $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['not_found'];
 }
 
 $connection->close();
@@ -152,13 +152,23 @@ $excludeKeys = [
 
     <?php if(isset($macAddressesValue['error'])) : ?>
         <?php foreach ($configs['error_messages']['mac_address_errors'] as $error) :?>
-            <?php if($error == $macAddressesValue['error']) :?>
+            <?php if($error == $macAddressesValue['error'] ) :?>
                 <tr>
                     <td nowrap="nowrap"><?= $macAddressesValue['error'];?></td>
                 </tr>
             <?php endif ?>
         <?php endforeach;?>
     <?php else: ?>
+    <?php
+
+
+
+
+
+
+
+
+    ?>
         <?php foreach ($macAddressesValue as $line) : ?>
             <?php
             $tdValues =[];

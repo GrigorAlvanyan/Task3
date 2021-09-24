@@ -122,7 +122,6 @@ class Client
             $r = $this->getResponses();
         }
 
-
         if ($asArray) {
             $result = explode(PHP_EOL, $r);
         } else {
