@@ -159,43 +159,12 @@ $excludeKeys = [
             <?php endif ?>
         <?php endforeach;?>
     <?php else: ?>
-    <?php
-
-
-
-
-
-
-
-
-    ?>
         <?php foreach ($macAddressesValue as $line) : ?>
             <?php
             $tdValues =[];
             foreach ($line as $key => $str) {
-                $tdValue = [];
-                $displayNameValue = '';
-                $dispValue = '';
-                $macStatus = '';
-                $name = '';
-                $strValue = '';
-                if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
-                    $displayNameValue = (int)$str;
-                    $name = $key;
-                    $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
-                    if (isset($macValueStatuses) && !empty($macValueStatuses)) {
-                        $strValue = $macValueStatuses['dispName'] . '<br>';
-                        $macStatus = $macValueStatuses['statuses'];
-                    } else {
-                        $strValue = $name . ':' . $displayNameValue . '<br>';
-                        $macStatus = '';
-                    }
-                    $tdValue = [
-                        'strValue' => $strValue,
-                        'macStatus' => $macStatus
-                    ];
-                    $tdValues[] = $tdValue;
-                }
+                $tdValues = getMacAddressValue($excludeKeys, $str, $configTdataRanges, $line, $key);
+                $tdValues = isset($tdValues) && !empty($tdValues) ? $tdValues : '';
             }
             ?>
             <tr style="vertical-align: top;">
@@ -247,6 +216,8 @@ $excludeKeys = [
 </table>
 
 <script>
+
+
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({

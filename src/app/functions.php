@@ -7,6 +7,36 @@ function dbConnection($dbConfigs, $personalinfo)
     return $connection;
 }
 
+function getMacAddressValue($excludeKeys, $str, $configTdataRanges, $line, $key)
+{
+    $tdValue = [];
+    $displayNameValue = '';
+    $dispValue = '';
+    $macStatus = '';
+    $name = '';
+    $strValue = '';
+    if (isset($key) && !empty($key) && !in_array($key, $excludeKeys)) {
+        $displayNameValue = (int)$str;
+        $name = $key;
+        $macValueStatuses = getMacAddressValues($configTdataRanges, $displayNameValue, $name, $line['Table_Name']);
+        if (isset($macValueStatuses) && !empty($macValueStatuses)) {
+            $strValue = $macValueStatuses['dispName'] . '<br>';
+            $macStatus = $macValueStatuses['statuses'];
+        } else {
+            $strValue = $name . ':' . $displayNameValue . '<br>';
+            $macStatus = '';
+        }
+        $tdValue = [
+            'strValue' => $strValue,
+            'macStatus' => $macStatus
+        ];
+        $tdValues[] = $tdValue;
+    }
+    if(!empty($tdValues)) {
+        return $tdValues;
+    }
+}
+
 function htmlTableDecode($value, $errorsMessage){
     $htmlTable = @zlib_decode(substr(base64_decode("{$value['tdata_value']}"), 4));
     if (empty($htmlTable)) {
