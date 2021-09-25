@@ -29,7 +29,7 @@ class Client
 
     const ERROR_0 = "success";
 
-    CONST ERROR_1 = "couldn't open network connection";
+    const ERROR_1 = "couldn't open network connection";
 
     const ERROR_2 = "unknown host";
 
@@ -180,8 +180,6 @@ class Client
 
         do {
             $r .= fread($this->connection, 10000); //length 1000
-//            $s = stream_get_meta_data($this->connection);
-
         } while (!$this->strpos_arr($r, $this->users)) ;
 
         return $this->removeNonPrintableCharacters($r);

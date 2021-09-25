@@ -1,5 +1,3 @@
-
-
 <table class="table_1">
     <tr>
         <th colspan=2><b>System</b></th>

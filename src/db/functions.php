@@ -35,7 +35,6 @@ function objectProperties($connection, $nodeName, $returnData)
 
         if (!isset($objectProperties)) {
             $returnData['object_properties']['name'] = "(Name: $nodeName not found)";
-//            dd($returnData);die;
             return ['returnData' => $returnData];
         }
 

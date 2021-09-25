@@ -137,7 +137,6 @@ $excludeKeys = [
                 }
             }
             ?>
-
             <tr>
                 <td class='even_th'><?= $value['description'] ?></td>
                 <td><?= $value['idata_value'] ?></td>
