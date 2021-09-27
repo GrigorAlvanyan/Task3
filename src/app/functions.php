@@ -85,48 +85,48 @@ function getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage)
         $tdata = 'tdata_' .  $objectProp['object_id'];
         $isLocal = isLocal();
         if (isset($isLocal) && $isLocal) {
-        $tdata = 'tdata_78528';
+            $tdata = 'tdata_78528';
         }
         $tableIdValues = itemIdsArray($connection, $tdata);
-            foreach ($tableIdValues as $resultItem) {
-                $resultValues = tdataArrayValues($connection, $tdata, $resultItem);
-                 foreach ($resultValues as $value) {
-                     $htmlTable = htmlTableDecode($value, $errorsMessage);
-                     if (isset($htmlTable['error'])) {
-                         return $htmlTable;
-                     }
-                        $result = getDomDocument($htmlTable);
-                        $rows = $result['rows'];
-                        $tableName = $result['tableName'];
-                        $columnCount = $result['columnCount'];
-                        $col = $result['col'];
-                        foreach ($rows as $row) {
-                            $cols = $row->getElementsByTagName('td');
-                            if ($cols->item(1)->nodeValue == $eoc_mac) {
-                                $numb++;
-                                $macAddressTable = [];
-                                $mac = '';
-                                $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
-                                $item = 0;
-                                $tablesName = [
-                                    'id' => $resultItem['item_id'],
-                                    'Table_Name' => $tableName,
-                                    'MAC' => $mac,
-                                ];
-                                for ($i = 2; $i < $columnCount; $i++) {
+        foreach ($tableIdValues as $resultItem) {
+            $resultValues = tdataArrayValues($connection, $tdata, $resultItem);
+            foreach ($resultValues as $value) {
+                $htmlTable = htmlTableDecode($value, $errorsMessage);
+                if (isset($htmlTable['error'])) {
+                    return $htmlTable;
+                }
+                $result = getDomDocument($htmlTable);
+                $rows = $result['rows'];
+                $tableName = $result['tableName'];
+                $columnCount = $result['columnCount'];
+                $col = $result['col'];
+                foreach ($rows as $row) {
+                    $cols = $row->getElementsByTagName('td');
+                    if ($cols->item(1)->nodeValue == $eoc_mac) {
+                        $numb++;
+                        $macAddressTable = [];
+                        $mac = '';
+                        $mac = 'MAC:' . $cols->item(1)->nodeValue . ' ';
+                        $item = 0;
+                        $tablesName = [
+                            'id' => $resultItem['item_id'],
+                            'Table_Name' => $tableName,
+                            'MAC' => $mac,
+                        ];
+                        for ($i = 2; $i < $columnCount; $i++) {
 
-                                    $val = $cols->item($i)->nodeValue . ' ';
-                                    $tablesName["{$col[$item]}"] = $val;
-                                }
-                                $macAddressTable = $tablesName;
-                                $macAddressTables[] = $macAddressTable;
-                            }
+                            $val = $cols->item($i)->nodeValue . ' ';
+                            $tablesName["{$col[$item]}"] = $val;
                         }
+                        $macAddressTable = $tablesName;
+                        $macAddressTables[] = $macAddressTable;
                     }
+                }
             }
-            if ($numb == 0) {
-                return  ['error' => $errorsMessage['mac_address_errors']['mac_address_not_found']];
-            }
+        }
+        if ($numb == 0) {
+            return  ['error' => $errorsMessage['mac_address_errors']['mac_address_not_found']];
+        }
         return $macAddressTables;
     } else {
         return ['error' => $errorsMessage['mac_address_errors']['result_table_not_found']];
@@ -331,3 +331,47 @@ function configIdataRanges($configRanges, $arrValues)
     return $arrValues;
 }
 
+function getMacAddressesData($connection, $objectProp, $personalinfo, $errorsMessage)
+{
+    if (!empty($objectProp)) {
+        if (isLocal()) {
+            if(isset($personalinfo) && !empty($personalinfo)){
+                $macName = $personalinfo;
+                if(strlen(implode('', explode(':', trim($macName)))) == 12){
+                    $eoc_mac = implode('', explode(':', trim($macName)));
+                    $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp, $errorsMessage);
+                    return $macAddressesValue;
+                } else {
+                    $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
+                    return $macAddressesValue;
+                }
+            } else {
+                $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
+                return $macAddressesValue;
+            }
+        } else {
+            if (isset($personalinfo)) {
+                if (strpos($personalinfo, "375828706861857")) {
+                    $eoc_tmp_array = explode("**", substr($personalinfo, strpos($personalinfo, "7375828706861857"), 38));
+                    if(isset($eoc_tmp_array[2]) && !empty($eoc_tmp_array[2])) {
+                        if (strlen(str_replace(":", "", $eoc_tmp_array[2])) == 12) {
+                            $eoc_mac = str_replace(":", "", $eoc_tmp_array[2]);
+                            $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage);
+                            return $macAddressesValue;
+
+                        } else {
+                            $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
+                            return $macAddressesValue;
+                        }
+                    } else {
+                        $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
+                        return $macAddressesValue;
+                    }
+                }
+            }
+        }
+    } else {
+        $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['not_found'];
+        return $macAddressesValue;
+    }
+}

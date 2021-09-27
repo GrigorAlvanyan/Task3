@@ -15,6 +15,7 @@ $errorsMessage = $configs['error_messages'];
 $configIdataRanges = isset($configs['idata_ranges']) ? $configs['idata_ranges'] : [];
 $filteredNames = isset($configs['filteredNames']) ? $configs['filteredNames'] : [];
 $configTdataRanges = isset($configs['tdata_ranges']) ? $configs['tdata_ranges'] : [];
+$statuses = [];
 
 if (isLocal()) {
     $eoc_ip = $row[15];
@@ -23,61 +24,23 @@ if (isLocal()) {
 }
 
 $nodeName = '';
+$nodeName = $personalinfo[2];
 $severityValue = [];
+$macAddressesValue = [];
+$excludeKeys = [
+    'id',
+    'Table_Name',
+    'MAC',
+];
 
 $connection = dbConnection($configs['db_params'], null);
-
-if (isLocal()) {
-    $nodeName = $personalinfo[2];
-} else {
-    $nodeName = $personalinfo[2];
-}
-
-
-
 $results = getResult($connection, $nodeName, $filteredNames, $severityStatuses, $severityValue, $errorsMessage);
+$objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
+$statuses = configIdataRanges($configIdataRanges, $statuses);
+$macAddressesValue = getMacAddressesData($connection, $objectProp, $personalinfo[43], $errorsMessage);
+
 if (isset($results['error'])) {
     echo $results['error'];
-}
-
-$macAddressesValue = [];
-$errorOffset = '';
-$errorWrongMacAddress = '';
-$objectProp = getObjectProperties($connection, $nodeName, $errorsMessage);
-
-if (!empty($objectProp)) {
-    if (isLocal()) {
-        if(isset($personalinfo[43]) && !empty($personalinfo[43])){
-            $macName = $personalinfo[43];
-            if(strlen(implode('', explode(':', trim($macName)))) == 12){
-                $eoc_mac = implode('', explode(':', trim($macName)));
-                $macAddressesValue = getMaccAddress($connection,$eoc_mac, $objectProp, $errorsMessage);
-            } else {
-                $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
-            }
-        } else {
-            $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
-        }
-    } else {
-        if (isset($personalinfo[43])) {
-            if (strpos($personalinfo[43], "375828706861857")) {
-                $eoc_tmp_array = explode("**", substr($personalinfo[43], strpos($personalinfo[43], "7375828706861857"), 38));
-                if(isset($eoc_tmp_array[2]) && !empty($eoc_tmp_array[2])) {
-                    if (strlen(str_replace(":", "", $eoc_tmp_array[2])) == 12) {
-                        $eoc_mac = str_replace(":", "", $eoc_tmp_array[2]);
-                        $macAddressesValue = getMaccAddress($connection, $eoc_mac, $objectProp, $errorsMessage);
-                    } else {
-                        $macAddressesValue['error'] =  $errorsMessage['mac_address_errors']['wrong_mac_address'];
-                    }
-                }
-                else {
-                    $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['no_mac_address'];
-                }
-            }
-        }
-    }
-} else {
-    $macAddressesValue['error'] = $errorsMessage['mac_address_errors']['not_found'];
 }
 
 $connection->close();
@@ -85,16 +48,6 @@ $connection->close();
 $status = isset($results['severityValue']) && isset($results['severityValue']['max']) ? $results['severityValue']['max'] : '';
 $severity = isset($results['severityValue']) && isset($results['severityValue']['severityName']) ? $results['severityValue']['severityName'] : '';
 $name = isset($results['object_properties']) && isset($results['object_properties']['name']) ? $results['object_properties']['name'] : '';
-
-$statuses = [];
-
-$statuses = configIdataRanges($configIdataRanges, $statuses);
-
-$excludeKeys = [
-    'id',
-    'Table_Name',
-    'MAC',
-];
 
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -216,7 +169,6 @@ $excludeKeys = [
 
 <script>
 
-
     $(document).ready(function(){
         $("#get_tables").click(function(){
             $.ajax({
@@ -235,7 +187,6 @@ $excludeKeys = [
                 }
             });
         });
-
 
         $('#restartRouter a').click(function() {
             if (confirm('Вы уверены что хотите перезагрузить роутер?')) {
